@@ -1,0 +1,209 @@
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.db.models import Q
+from typing import List, Optional
+import torch
+from setfit import SetFitModel
+from tqdm import tqdm
+import logging
+from pathlib import Path
+import time
+import warnings
+
+from core.models import Content, ModelConfig, TopicPrediction
+
+logger = logging.getLogger(__name__)
+
+class Command(BaseCommand):
+    help = 'Run topic predictions on content using trained SetFit models'
+
+    def add_arguments(self, parser):
+        parser.add_argument(
+            '--model-config',
+            type=str,
+            help='Specific model config ID to run predictions for'
+        )
+        parser.add_argument(
+            '--batch-size',
+            type=int,
+            default=100,
+            help='Number of content items to process in each batch'
+        )
+        parser.add_argument(
+            '--min-confidence',
+            type=float,
+            default=0.0,
+            help='Minimum confidence threshold for saving predictions'
+        )
+        parser.add_argument(
+            '--reset',
+            action='store_true',
+            help='Delete existing predictions before running'
+        )
+
+    def handle(self, *args, **options):
+        # Set up verbose logging
+        logging.basicConfig(
+            level=logging.INFO,
+            format='%(asctime)s %(levelname)s: %(message)s',
+            datefmt='%H:%M:%S'
+        )
+        
+        logger.info("Starting prediction process")
+        logger.info(f"Options: batch_size={options['batch_size']}, min_confidence={options['min_confidence']}")
+        
+        # Get model configs to process
+        if options['model_config']:
+            model_configs = ModelConfig.objects.filter(id=options['model_config'])
+            if not model_configs.exists():
+                logger.error(f"Model config {options['model_config']} not found")
+                return
+        else:
+            model_configs = ModelConfig.objects.all()
+        
+        logger.info(f"Found {model_configs.count()} model configs to process")
+        
+        for model_config in model_configs:
+            try:
+                self._process_model_config(
+                    model_config,
+                    batch_size=options['batch_size'],
+                    min_confidence=options['min_confidence'],
+                    reset=options['reset']
+                )
+            except Exception as e:
+                logger.exception(f"Error processing model {model_config.name}")
+
+    def _process_model_config(self, model_config: ModelConfig, batch_size: int,
+                            min_confidence: float, reset: bool):
+        """Process a single model config"""
+        logger.info(f"\nStarting processing for model: {model_config.name}")
+        
+        # Load the model
+        model_path = Path(model_config.get_model_path())
+        logger.info(f"Loading model from: {model_path}")
+        
+        if not model_path.exists():
+            logger.error(f"Model not found at {model_path}")
+            return
+        
+        try:
+            start_load = time.time()
+            model = SetFitModel.from_pretrained(str(model_path))
+            logger.info(f"Model loaded successfully in {time.time() - start_load:.1f}s")
+        except Exception as e:
+            logger.exception("Error loading model")
+            return
+        
+        # Delete existing predictions if requested
+        if reset:
+            logger.info("Deleting existing predictions...")
+            count = TopicPrediction.objects.filter(model_config=model_config).count()
+            TopicPrediction.objects.filter(model_config=model_config).delete()
+            logger.info(f"Deleted {count} existing predictions")
+        
+        # Get content to process
+        logger.info("Querying content to process...")
+        existing_predictions = TopicPrediction.objects.filter(
+            model_config=model_config
+        ).values_list('content_id', flat=True)
+        
+        content_query = Content.objects.exclude(
+            id__in=existing_predictions
+        ).order_by('id')
+        
+        total_content = content_query.count()
+        if total_content == 0:
+            logger.info("No new content to process")
+            return
+            
+        logger.info(f"Found {total_content} items to process")
+        
+        # Process in batches
+        predictions_created = 0
+        start_time = time.time()
+        batch_times = []
+        
+        for start_idx in range(0, total_content, batch_size):
+            end_idx = min(start_idx + batch_size, total_content)
+            batch_start_time = time.time()
+            
+            logger.info(f"\nProcessing batch {start_idx + 1}-{end_idx} of {total_content}")
+            
+            try:
+                batch = list(content_query[start_idx:end_idx])
+                logger.info(f"Retrieved {len(batch)} items for processing")
+                
+                created = self._process_batch(
+                    batch, model, model_config, min_confidence
+                )
+                predictions_created += created
+                
+                batch_time = time.time() - batch_start_time
+                batch_times.append(batch_time)
+                avg_batch_time = sum(batch_times) / len(batch_times)
+                
+                logger.info(
+                    f"Batch complete: {created} predictions created in {batch_time:.1f}s "
+                    f"(avg {avg_batch_time:.1f}s per batch)"
+                )
+                logger.info(
+                    f"Progress: {end_idx}/{total_content} items "
+                    f"({(end_idx/total_content)*100:.1f}%)"
+                )
+                
+            except Exception as e:
+                logger.exception(f"Error processing batch {start_idx}-{end_idx}")
+                continue
+        
+        elapsed_time = time.time() - start_time
+        logger.info(
+            f"\nFinished processing {model_config.name}:\n"
+            f"- Created {predictions_created} predictions\n"
+            f"- Processed {total_content} items\n"
+            f"- Took {elapsed_time:.1f} seconds\n"
+            f"- Average {(total_content/elapsed_time):.1f} items/second"
+        )
+
+    def _process_batch(self, content_items: List[Content], model: SetFitModel,
+                      model_config: ModelConfig, min_confidence: float) -> int:
+        """Process a batch of content items and return number of predictions created"""
+        if not content_items:
+            return 0
+            
+        # Get texts for prediction
+        texts = [item.title for item in content_items]
+        logger.info(f"Getting predictions for {len(texts)} items")
+        
+        try:
+            # Get model predictions and probabilities
+            prediction_start = time.time()
+            probs = model.predict_proba(texts)
+            logger.info(f"Predictions completed in {time.time() - prediction_start:.1f}s")
+            
+            # Create predictions
+            predictions = []
+            for content, prob in zip(content_items, probs):
+                confidence = float(max(prob))
+                if confidence >= min_confidence:
+                    result = 'relevant' if prob[1] >= prob[0] else 'irrelevant'
+                    predictions.append(
+                        TopicPrediction(
+                            content=content,
+                            model_config=model_config,
+                            result=result,
+                            confidence=confidence
+                        )
+                    )
+            
+            # Bulk create predictions
+            create_start = time.time()
+            with transaction.atomic():
+                TopicPrediction.objects.bulk_create(predictions)
+            logger.info(f"Saved {len(predictions)} predictions in {time.time() - create_start:.1f}s")
+            
+            return len(predictions)
+            
+        except Exception as e:
+            logger.exception("Error in batch processing")
+            raise

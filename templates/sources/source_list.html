@@ -1,0 +1,19 @@
+{% extends 'sources/base.html' %}
+
+{% block source_list %}
+    <h2 class="text-lg font-bold px-4 py-2 text-gray-700 dark:text-gray-200">Sources</h2>
+    <ul class="space-y-1">
+        {% for source in sources %}
+            <li class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
+                <a hx-get="/source/{{ source.id }}/" 
+                   hx-target="#article-list"
+                   class="flex justify-between items-center">
+                    <span>{{ source.name }}</span>
+                    <span class="text-sm text-gray-500 dark:text-gray-400">
+                        {{ source.content_set.count }}
+                    </span>
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+{% endblock %}

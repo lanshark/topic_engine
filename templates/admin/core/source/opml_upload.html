@@ -1,0 +1,29 @@
+{% extends "admin/base_site.html" %}
+{% load i18n static %}
+
+{% block content %}
+<div class="module">
+    <h2>Import RSS Feeds from OPML</h2>
+    <form action="." method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+        <div class="form-row">
+            {{ form.opml_file.errors }}
+            <label for="id_opml_file">OPML File:</label>
+            {{ form.opml_file }}
+        </div>
+        <div class="submit-row">
+            <input type="submit" value="Upload OPML" class="default" />
+        </div>
+    </form>
+</div>
+
+<div class="help">
+    <h3>Instructions</h3>
+    <ul>
+        <li>Upload an OPML file containing RSS feed subscriptions</li>
+        <li>Feeds will be automatically added as Sources</li>
+        <li>Duplicate feeds will be skipped</li>
+        <li>Only RSS feeds will be imported (webpage sources must be added manually)</li>
+    </ul>
+</div>
+{% endblock %}

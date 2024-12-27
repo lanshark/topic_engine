@@ -1,0 +1,119 @@
+{% block article_detail %}
+<div class="article-detail">
+    <section class="basic-info">
+        <h3>{{ article.title }}</h3>
+        <dl>
+            <dt>Source</dt>
+            <dd>{{ article.source.name }} ({{ article.source.source_type }})</dd>
+            
+            <dt>URL</dt>
+            <dd><a href="{{ article.url }}" target="_blank">{{ article.url }}</a></dd>
+            
+            <dt>Created</dt>
+            <dd>{{ article.created_at|date:"Y-m-d H:i:s" }}</dd>
+        </dl>
+    </section>
+
+    <section class="content">
+        <h4>Raw Content</h4>
+        <div class="content-box">{{ article.raw_content }}</div>
+        
+        {% if article.processed_content %}
+        <h4>Processed Content</h4>
+        <div class="content-box">{{ article.processed_content|pprint }}</div>
+        {% endif %}
+    </section>
+
+    <section class="processing">
+        <h4>Processing State</h4>
+        <dl>
+            <dt>Status</dt>
+            <dd>{{ article.processed|yesno:"Processed,Unprocessed" }}</dd>
+            {% if article.processing_errors %}
+            <dt>Errors</dt>
+            <dd>{{ article.processing_errors|join:", " }}</dd>
+            {% endif %}
+        </dl>
+    </section>
+
+    <section class="topics">
+        <h4>Topics</h4>
+        {% if article.topics.exists %}
+        <ul>
+            {% for topic in article.topics.all %}
+            <li>{{ topic.name }}</li>
+            {% endfor %}
+        </ul>
+        {% else %}
+        <p>No topics assigned</p>
+        {% endif %}
+    </section>
+
+    <section class="geo">
+        <h4>Geographic Data</h4>
+        {% if article.location or article.geo_context %}
+        <dl>
+            {% if article.location %}
+            <dt>Location</dt>
+            <dd>{{ article.location.x }}, {{ article.location.y }}</dd>
+            {% endif %}
+            {% if article.geo_context %}
+            <dt>Context</dt>
+            <dd>{{ article.geo_context|pprint }}</dd>
+            {% endif %}
+        </dl>
+        {% else %}
+        <p>No geographic data</p>
+        {% endif %}
+    </section>
+
+    <section class="actions">
+        <button hx-post="/article/{{ article.id }}/mark/" 
+                hx-vals='{"action": "relevant"}'
+                class="btn btn-success">
+            Mark as Relevant
+        </button>
+        <button hx-post="/article/{{ article.id }}/mark/" 
+                hx-vals='{"action": "irrelevant"}'
+                class="btn btn-danger">
+            Mark as Irrelevant
+        </button>
+    </section>
+</div>
+
+<style>
+.article-detail {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+section {
+    margin-bottom: 1.5rem;
+    padding: 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+}
+dl {
+    display: grid;
+    grid-template-columns: 120px 1fr;
+    gap: 0.5rem;
+}
+dt {
+    font-weight: bold;
+}
+.content-box {
+    padding: 1rem;
+    background: #f5f5f5;
+    border-radius: 4px;
+    white-space: pre-wrap;
+}
+.btn {
+    padding: 0.5rem 1rem;
+    margin-right: 0.5rem;
+    border-radius: 4px;
+    border: none;
+    cursor: pointer;
+}
+.btn-success { background: #28a745; color: white; }
+.btn-danger { background: #dc3545; color: white; }
+</style>
+{% endblock %}

@@ -1,0 +1,54 @@
+{% block article_list %}
+<div class="p-4">
+    <h2 class="text-xl mb-4">Articles from {{ source.name }}</h2>
+    
+    <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <thead class="bg-gray-50 dark:bg-gray-800">
+            <tr>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Date
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Title
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Prediction
+                </th>
+                <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
+                    Confidence
+                </th>
+            </tr>
+        </thead>
+        <tbody class="bg-white dark:bg-gray-900 divide-y divide-gray-200 dark:divide-gray-700">
+            {% for article in articles %}
+            <tr class="hover:bg-gray-50 dark:hover:bg-gray-800">
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
+                    {{ article.date }}
+                </td>
+                <td class="px-6 py-4">
+                    <a href="#" 
+                       hx-get="/article/{{ article.id }}/"
+                       hx-target="#article-detail"
+                       class="text-blue-600 dark:text-blue-400 hover:underline">
+                        {{ article.title }}
+                    </a>
+                </td>
+                <td class="px-6 py-4">
+                    <span class="{% if article.prediction == 'relevant' %}text-green-600{% elif article.prediction == 'irrelevant' %}text-red-600{% endif %}">
+                        {{ article.prediction }}
+                    </span>
+                </td>
+                <td class="px-6 py-4">
+                    <div class="w-full bg-gray-200 rounded h-2">
+                        <div class="bg-green-600 h-2 rounded" 
+                             style="width: {{ article.confidence_pct }}%">
+                        </div>
+                    </div>
+                    {{ article.confidence_pct }}%
+                </td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+{% endblock %}
