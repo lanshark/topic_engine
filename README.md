@@ -54,7 +54,7 @@ git clone https://github.com/NimbleMachine-andrew/topic_engine.git
 cd topic_engine
 ```
 
-2. We use (UV)[https://docs.astral.sh/uv/] to Install dependencies:
+2. We use [UV](https://docs.astral.sh/uv/) to Install dependencies:
 ```bash
 uv venv
 uv sync
