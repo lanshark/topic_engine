@@ -69,10 +69,13 @@ uv sync
 
     Create a User:
 
+```bash
     sudo -u postgres psql << EOF
         CREATE USER topic_engine WITH PASSWORD 'mypassword';
     EOF
+```
 
+```bash
     sudo -u postgres psql << EOF 
         DROP DATABASE IF EXISTS topic_engine;
         CREATE DATABASE topic_engine ENCODING='UTF-8' OWNER topic_engine;
@@ -84,6 +87,7 @@ uv sync
         GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO topic_engine;
         GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO topic_engine;
     EOF
+```
 
 
 5. Set up the database:
