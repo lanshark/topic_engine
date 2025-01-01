@@ -54,7 +54,7 @@ git clone https://github.com/NimbleMachine-andrew/topic_engine.git
 cd topic_engine
 ```
 
-2. We use [UV](https://docs.astral.sh/uv/) to Install dependencies:
+2. We use [UV](https://docs.astral.sh/uv/) to Manage dependencies:
 ```bash
 uv venv
 uv sync
@@ -141,7 +141,7 @@ We chose the AGPL to:
 
 ## 📋 Roadmap
 
-Check our [Project Board](https://github.com/NimbleMachine-andrew/topic-engine/projects/1) for current development priorities.
+Check our [Project Board](https://github.com/NimbleMachine-andrew/topic_engine/projects/1) for current development priorities.
 
 Near-term goals:
 - [ ] Improve documentation and examples
@@ -160,4 +160,4 @@ The Topic Engine builds on many excellent open source projects and ideas. Specia
 
 ## 🤔 Questions?
 
-Feel free to [open an issue](https://github.com/NimbleMachine-andrew/topic-engine/issues) or join our community channels. We're here to help!
+Feel free to [open an issue](https://github.com/NimbleMachine-andrew/topic_engine/issues) or join our community channels. We're here to help!
