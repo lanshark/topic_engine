@@ -14,38 +14,38 @@ dependencies = [
     "psycopg2-binary>=2.9.10",
     
     # ML/AI
-    "torch>=2.5.1",
-    "transformers>=4.42.2",
-    "sentence-transformers>=3.3.1",
-    "setfit>=1.1.0",
-    "scikit-learn>=1.5.2",
     "numpy>=1.26.4",
     "pandas>=2.2.3",
+    "scikit-learn>=1.5.2",
+    "sentence-transformers>=3.3.1",
+    "setfit>=1.1.0",
+    "torch>=2.5.1",
+    "transformers>=4.42.2",
     
     # Web Scraping
-    "playwright>=1.49.0",
-    "trafilatura>=1.12.2",
     "beautifulsoup4>=4.12.3",
+    "feedparser>=6.0.11",
+    "playwright>=1.49.0",
     "requests>=2.32.3",
     "requests-html>=0.10.0",
-    "feedparser>=6.0.11",
+    "trafilatura>=1.12.2",
     
     # Date/Time
-    "python-dateutil>=2.9.0",
     "dateparser>=1.2.0",
+    "python-dateutil>=2.9.0",
     
     # Utilities
-    "tqdm>=4.67.1",
     "pyyaml>=6.0.2",
+    "tqdm>=4.67.1",
 ]
 
 [project.optional-dependencies]
 dev = [
+    "black>=24.2.0",
+    "ipython>=8.29.0",
     "pytest>=8.3.3",
     "pytest-django>=4.9.0",
     "pytest-asyncio>=0.24.0",
-    "ipython>=8.29.0",
-    "black>=24.2.0",
     "ruff>=0.3.0",
     "Werkzeug>=3.0.1",
 ]

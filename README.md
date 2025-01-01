@@ -64,9 +64,16 @@ uv sync
 
     Copy the env-example to .env, edit for your values.
 
+
 4. Create a postgres/postgis database for the application:
 
+    Create a User:
+
     sudo -u postgres psql << EOF
+        CREATE USER topic_engine WITH PASSWORD 'mypassword';
+    EOF
+
+    sudo -u postgres psql << EOF 
         DROP DATABASE IF EXISTS topic_engine;
         CREATE DATABASE topic_engine ENCODING='UTF-8' OWNER topic_engine;
         \c topic_engine
