@@ -1,0 +1,12 @@
+ALLOWED_HOSTS=localhost, 127.0.0.1
+DEBUG=False
+LOG_LEVEL=INFO
+# to generate a new secret key:
+# python -c 'from django.core.management.utils import get_random_secret_key; print(get_random_secret_key())'
+DJANGO_SECRET_KEY=<CHANGE_ME!>
+TOPIC_ENGINE_ENVIRONMENT=production
+POSTGRES_DB=topic_engine
+POSTGRES_HOST=localhost
+POSTGRES_PORT=5432
+POSTGRES_USER=topic_engine
+POSTGRES_PASSWORD=<CHANGE_ME!>

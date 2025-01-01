@@ -1,12 +1,11 @@
 # core/logging/logger.py
 
 import logging
-import uuid
-from functools import wraps
 import time
+import uuid
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from typing import Dict, Optional
-from contextlib import contextmanager
 
 
 @dataclass

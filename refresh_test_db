@@ -5,14 +5,14 @@ echo "Resetting test database..."
 # Drop and recreate database
 sudo -u postgres psql << EOF
 DROP DATABASE IF EXISTS topic_engine_test;
-CREATE DATABASE topic_engine_test OWNER andrew;
+CREATE DATABASE topic_engine_test ENCODING='UTF-8' OWNER test;
 \c topic_engine_test
 CREATE EXTENSION postgis;
 CREATE EXTENSION postgis_topology;
-ALTER DATABASE topic_engine_test OWNER TO andrew;
-GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO andrew;
-GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO andrew;
-GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO andrew;
+ALTER DATABASE topic_engine_test OWNER TO test;
+GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO test;
+GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO test;
+GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO test;
 EOF
 
 echo "Test database reset complete"

@@ -1,7 +1,7 @@
 from .base import *
 
 DEBUG = False
-ALLOWED_HOSTS = env.list('DJANGO_ALLOWED_HOSTS')
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", cast=Csv())
 
 # Security
 SECURE_SSL_REDIRECT = True
@@ -14,15 +14,15 @@ SECURE_HSTS_INCLUDE_SUBDOMAINS = True
 SECURE_HSTS_PRELOAD = True
 
 # Update logging for production
-LOGGING['loggers']['topic_engine']['level'] = 'INFO'
-LOGGING['loggers']['topic_engine.content']['level'] = 'INFO'
-LOGGING['loggers']['topic_engine.topics']['level'] = 'INFO'
-LOGGING['loggers']['topic_engine.sources']['level'] = 'INFO'
+LOGGING["loggers"]["topic_engine"]["level"] = "INFO"
+LOGGING["loggers"]["topic_engine.content"]["level"] = "INFO"
+LOGGING["loggers"]["topic_engine.topics"]["level"] = "INFO"
+LOGGING["loggers"]["topic_engine.sources"]["level"] = "INFO"
 
 # Disable console logging in production
-for logger in LOGGING['loggers'].values():
-    if 'console' in logger['handlers']:
-        logger['handlers'].remove('console')
+for logger in LOGGING["loggers"].values():
+    if "console" in logger["handlers"]:
+        logger["handlers"].remove("console")
 
 # Optionally add other production-specific handlers (like syslog)
 # LOGGING['handlers']['syslog'] = {
