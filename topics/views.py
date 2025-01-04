@@ -5,7 +5,7 @@ from django.shortcuts import get_object_or_404
 from core.models import Content
 
 BASE_TRAINING_PATH = 'training_data'
-DEFAULT_TOPIC = 'accidents'
+DEFAULT_TOPIC = ''
 
 def add_training_data(request, article_id):
     if request.method == 'POST':
