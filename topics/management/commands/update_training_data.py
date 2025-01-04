@@ -4,7 +4,7 @@ from django.core.management.base import BaseCommand
 BASE_TRAINING_PATH = 'training_data'
 
 class Command(BaseCommand):
-    help = 'Update training data for accident topics'
+    help = 'Update training data for topics'
 
     def add_arguments(self, parser):
         parser.add_argument('topic', type=str, help='The name of the training topic to update')
