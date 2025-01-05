@@ -1,0 +1,51 @@
+Topic Engine Management Commands
+
+
+predict_topics
+    Run topic predictions on content using trained SetFit models
+	
+    Arguments
+	--batch-size (default 50) Number of content items to process per batch
+	--min-confidence (default 0.0)  Minimum confidence threshhold for saving predictions
+	--verify (boolean)  Verify all content has predictions after processing
+	--content-ids (list of ids to process)
+	--reset (boolean)  Delete existing predictions before running
+	
+train_setfit_model
+    Train SetFit model with a given configuration
+	
+    Arguments
+        model_name  Name of the model configuration to use 
+            (small, medium, large) configs from ModelConfig table
+            
+        What are "relevant.txt" and "irrelevant.txt" files?
+        
+update_training_data
+    Update training data for topics
+	
+    Arguments
+        topic  Name of the training topic to update
+        label  Label for the Headline (relevant/irrelevant)
+        headline  The news headline
+        
+check_feeds
+    Check RSS feeds for new content
+    
+    Arguments
+        --once (boolean)  Run once and exit
+        --verbose (boolean)  Increase logging verbosity
+        --concurrency  (default 10)  Maximum concurrent feed checks
+        --timeout (default 300)  Timeout in seconds for each feed check
+        
+import_opml
+    Import RSS feeds from OPML file
+    
+    Arguments
+        --dry-run (boolean)  Show what would be imported without saving
+        
+run_scheduler
+    Run the content scheduler
+    
+    Arguments
+        None
+        
