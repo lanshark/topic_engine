@@ -1,7 +1,7 @@
 {% block article_list %}
 <div class="p-4">
     <h2 class="text-xl mb-4">Articles from {{ source.name }}</h2>
-    
+
     <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
         <thead class="bg-gray-50 dark:bg-gray-800">
             <tr>
@@ -26,7 +26,7 @@
                     {{ article.date }}
                 </td>
                 <td class="px-6 py-4">
-                    <a href="#" 
+                    <a href="#"
                        hx-get="/article/{{ article.id }}/"
                        hx-target="#article-detail"
                        class="text-blue-600 dark:text-blue-400 hover:underline">
@@ -40,7 +40,7 @@
                 </td>
                 <td class="px-6 py-4">
                     <div class="w-full bg-gray-200 rounded h-2">
-                        <div class="bg-green-600 h-2 rounded" 
+                        <div class="bg-green-600 h-2 rounded"
                              style="width: {{ article.confidence_pct }}%">
                         </div>
                     </div>

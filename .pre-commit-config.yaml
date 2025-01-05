@@ -1,0 +1,111 @@
+default_language_version:
+    python: python3.12
+exclude: 'docs|node_modules|migrations|bin|^.git$|gunicorn.conf.py'
+default_stages: [commit]
+fail_fast: false
+
+repos:
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.4.0
+    hooks:
+      - id: check-ast
+      - id: check-builtin-literals
+      - id: check-case-conflict
+      - id: check-docstring-first
+      - id: check-merge-conflict
+      - id: check-symlinks
+      - id: check-toml
+      - id: check-yaml
+      - id: debug-statements
+      - id: detect-private-key
+      - id: end-of-file-fixer
+      - id: fix-encoding-pragma
+        args: [--remove]
+      - id: forbid-submodules
+      - id: trailing-whitespace
+        args:
+          - "--markdown-linebreak-ext=md"
+
+  - repo: https://github.com/python-jsonschema/check-jsonschema
+    rev: 0.26.3
+    hooks:
+      - id: check-github-workflows
+      - id: check-dependabot
+
+  # allows json to have comments as opposed to pre-commit-hooks:check-json
+  - repo: https://gitlab.com/lansharkconsulting/public/check-pyjson5
+    rev: v1.0.1
+    hooks:
+      - id: check-pyjson5
+
+  - repo: https://github.com/asottile/add-trailing-comma
+    rev: v3.1.0
+    hooks:
+      - id: add-trailing-comma
+
+  - repo: https://github.com/psf/black
+    rev: 23.7.0
+    hooks:
+      - id: black
+
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    rev: v0.7.1
+    hooks:
+      - id: ruff
+
+  - repo: https://github.com/pycqa/isort
+    rev: 5.12.0
+    hooks:
+      - id: isort
+        name: isort (python)
+
+  - repo: https://github.com/adamchainz/django-upgrade
+    rev: 1.14.1
+    hooks:
+    - id: django-upgrade
+      args: [--target-version, "3.2"]  # eventually, 4.2...
+
+  - repo: https://github.com/asottile/pyupgrade
+    rev: v3.19.1
+    hooks:
+    - id: pyupgrade
+      args: [--py312-plus]
+
+# Temporarily disabled - consider pyright as well
+# - repo: https://github.com/pre-commit/mirrors-mypy
+#    rev: v1.4.1
+#    hooks:
+#      - id: mypy
+#        # This list probably needs expansion...
+#        additional_dependencies:
+#          - 'numpy'
+#          - 'pydantic'
+#          - 'types-PyYAML'
+#          - 'types-python-dateutil'
+#          - 'types-pytz'
+#          - 'types-requests'
+#          - 'types-setuptools'
+#          - 'types-toml'
+#          - 'django-stubs'
+
+# This is not very correct - hppefully it improves.  Also see:
+# https://github.com/devinsmith911/docker-compose-verifier/tree/master/.githooks
+#  - repo: https://github.com/iamthefij/docker-pre-commit
+#    rev: v3.0.1
+#    hooks:
+#      - id: docker-compose-check
+
+# TODO:
+#   Bandit
+# - repo: https://github.com/PyCQA/bandit
+#   rev: 1.7.5
+#   hooks:
+#   - id: bandit
+
+# Commitizen
+# - repo: https://github.com/commitizen-tools/commitizen
+#    rev: 3.5.2
+#    hooks:
+#      - id: commitizen
+#      - id: commitizen-branch
+#        stages: [push]

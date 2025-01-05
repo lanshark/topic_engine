@@ -1,15 +1,15 @@
 # sources/scheduler.py
+import logging
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-from django.utils import timezone
-from django.db import transaction
 from django.core.cache import cache
 from django.core.management import call_command
-import asyncio
-import logging
 from django.db.models import Q
+from django.utils import timezone
 
 from core.models import Source
+
 from .services import FeedProcessor
 
 logger = logging.getLogger(__name__)
@@ -34,7 +34,10 @@ class ContentScheduler:
 
         # Schedule feed checks
         self.scheduler.add_job(
-            self.check_feeds, IntervalTrigger(minutes=5), name="feed_check", replace_existing=True
+            self.check_feeds,
+            IntervalTrigger(minutes=5),
+            name="feed_check",
+            replace_existing=True,
         )
 
         # Schedule prediction processing
@@ -60,16 +63,21 @@ class ContentScheduler:
     async def check_feeds(self):
         """Check all active feeds"""
         try:
-            async for source in Source.objects.filter(active=True, source_type="rss").filter(
+            async for source in Source.objects.filter(
+                active=True,
+                source_type="rss",
+            ).filter(
                 Q(last_checked__isnull=True)
-                | Q(last_checked__lte=timezone.now() - timezone.timedelta(seconds=300))
+                | Q(last_checked__lte=timezone.now() - timezone.timedelta(seconds=300)),
             ):
                 try:
                     await self.processor.process_source(source)
-                    await Source.objects.filter(id=source.id).aupdate(last_checked=timezone.now())
-                except Exception as e:
+                    await Source.objects.filter(id=source.id).aupdate(
+                        last_checked=timezone.now(),
+                    )
+                except Exception:
                     logger.exception(f"Error checking source {source.id}")
-        except Exception as e:
+        except Exception:
             logger.exception("Error during feed check")
 
     async def process_predictions(self):
@@ -81,5 +89,5 @@ class ContentScheduler:
                 call_command("predict_topics", content_ids=list(pending_ids))
                 cache.delete("pending_prediction_content")
                 logger.info(f"Processed predictions for {len(pending_ids)} articles")
-            except Exception as e:
+            except Exception:
                 logger.exception("Error processing predictions")

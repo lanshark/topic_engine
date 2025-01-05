@@ -5,10 +5,10 @@
         <dl>
             <dt>Source</dt>
             <dd>{{ article.source.name }} ({{ article.source.source_type }})</dd>
-            
+
             <dt>URL</dt>
             <dd><a href="{{ article.url }}" target="_blank">{{ article.url }}</a></dd>
-            
+
             <dt>Created</dt>
             <dd>{{ article.created_at|date:"Y-m-d H:i:s" }}</dd>
         </dl>
@@ -17,7 +17,7 @@
     <section class="content">
         <h4>Raw Content</h4>
         <div class="content-box">{{ article.raw_content }}</div>
-        
+
         {% if article.processed_content %}
         <h4>Processed Content</h4>
         <div class="content-box">{{ article.processed_content|pprint }}</div>
@@ -68,12 +68,12 @@
     </section>
 
     <section class="actions">
-        <button hx-post="/article/{{ article.id }}/mark/" 
+        <button hx-post="/article/{{ article.id }}/mark/"
                 hx-vals='{"action": "relevant"}'
                 class="btn btn-success">
             Mark as Relevant
         </button>
-        <button hx-post="/article/{{ article.id }}/mark/" 
+        <button hx-post="/article/{{ article.id }}/mark/"
                 hx-vals='{"action": "irrelevant"}'
                 class="btn btn-danger">
             Mark as Irrelevant

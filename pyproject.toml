@@ -3,16 +3,33 @@ name = "topic_engine"
 version = "0.1.0"
 description = "Topic detection and content processing engine"
 requires-python = ">=3.12"
+authors = [
+    { name = "Andrew Shaffer", email = "andrew@accidentdatacenter.com" },
+    { name = "Scott Sharkey", email = "ssharkey@lanshark.com" },
+]
+homepage = "https://github.com/NimbleMachine-andrew/topic_engine"
+issues = "https://github.com/NimbleMachine-andrew/topic_engine/issues"
+keywords = ["Personal AI", "Artificial Intelligence"] 
+license = {file = "LICENSE"}
+repository = "https://github.com/NimbleMachine-andrew/topic_engine.git"
+readme="README.md"
+classifiers = [
+  "Development Status :: 3 - Alpha",
+  "Framework :: Django :: 5",
+  "Intended Audience :: Developers",
+  "Intended Audience :: End Users/Desktop",
+  "License :: OSI Approved :: GNU Affero General Public License v3",
+  "Programming Language :: Python",
+  "Programming Language :: Python :: 3.12",
+  "Topic :: Scientific/Engineering :: Artificial Intelligence",
+]
 dependencies = [
-    
     # Web Framework
     "Django>=5.1.3",
     "django-extensions>=3.2.3",
     "python-decouple>=3.8",
-
     # Database
     "psycopg2-binary>=2.9.10",
-    
     # ML/AI
     "numpy>=1.26.4",
     "pandas>=2.2.3",
@@ -21,19 +38,17 @@ dependencies = [
     "setfit>=1.1.0",
     "torch>=2.5.1",
     "transformers>=4.42.2",
-    
     # Web Scraping
     "beautifulsoup4>=4.12.3",
     "feedparser>=6.0.11",
+    "httpx>=0.28.1",
     "playwright>=1.49.0",
     "requests>=2.32.3",
     "requests-html>=0.10.0",
     "trafilatura>=1.12.2",
-    
     # Date/Time
     "dateparser>=1.2.0",
     "python-dateutil>=2.9.0",
-    
     # Utilities
     "pyyaml>=6.0.2",
     "tqdm>=4.67.1",
@@ -42,11 +57,15 @@ dependencies = [
 [project.optional-dependencies]
 dev = [
     "black>=24.2.0",
+    "django-stubs>=1.14",
+    "icecream>=2.1.3",
     "ipython>=8.29.0",
+    "model_bakery>=1.10",
     "pytest>=8.3.3",
     "pytest-django>=4.9.0",
     "pytest-asyncio>=0.24.0",
     "ruff>=0.3.0",
+    "types-requests>=2",
     "Werkzeug>=3.0.1",
 ]
 
@@ -71,17 +90,42 @@ python_files = ["test_*.py", "*_test.py"]
 addopts = "-ra -q"
 
 [tool.ruff]
-line-length = 100
+fix = true
+line-length = 88
+show-fixes = true
+target-version = "py312"
+
+[tool.ruff.isort]
+force-single-line = false
+known-first-party = [
+    "config",
+    "content",
+    "core",
+    "output",
+    "sources",
+    "topics",
+]
+lines-after-imports = 2
+
+[tool.ruff.lint]
 extend-select = [
     "E",   # pycodestyle
     "F",   # pyflakes
     "I",   # isort
     "B",   # flake8-bugbear
 ]
+task-tags = ["NOTE", "TODO",]
 
 [tool.black]
-line-length = 100
+line-length = 88
 target-version = ['py312']
+
+[tool.mypy]
+python_version = "3.12"
+plugins = "mypy_django_plugin.main"
+
+[tool.django-stubs]
+django_settings_module = "config.settings"
 
 [tool.uv.workspace]
 members = ["mcp_server"]

@@ -76,7 +76,7 @@ uv sync
 ```
 
 ```bash
-    sudo -u postgres psql << EOF 
+    sudo -u postgres psql << EOF
         DROP DATABASE IF EXISTS topic_engine;
         CREATE DATABASE topic_engine ENCODING='UTF-8' OWNER topic_engine;
         \c topic_engine

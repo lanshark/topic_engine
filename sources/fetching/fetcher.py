@@ -1,17 +1,15 @@
 # sources/fetching/fetcher.py
-from typing import Dict, List, Optional
 import logging
-import asyncio
 from dataclasses import dataclass, field
 from datetime import datetime
 
-from .types import ContentQuality, ContentValidation, FetchResult
-from .strategy import FetchStrategy
 from .config import FetcherConfig
-from .strategies.base import ContentFetchStrategy
-from .strategies.simple import SimpleHttpStrategy
-from .strategies.browser import BrowserStrategy
 from .strategies.archive import ArchiveStrategy
+from .strategies.base import ContentFetchStrategy
+from .strategies.browser import BrowserStrategy
+from .strategies.simple import SimpleHttpStrategy
+from .strategy import FetchStrategy
+from .types import ContentQuality, FetchResult
 
 logger = logging.getLogger(__name__)
 
@@ -21,14 +19,14 @@ class FetchHistory:
     """Historical fetch results for a URL pattern"""
 
     pattern: str
-    successful_strategies: Dict[FetchStrategy, int] = field(
-        default_factory=lambda: {strategy: 0 for strategy in FetchStrategy}
+    successful_strategies: dict[FetchStrategy, int] = field(
+        default_factory=lambda: {strategy: 0 for strategy in FetchStrategy},
     )
-    failed_strategies: Dict[FetchStrategy, int] = field(
-        default_factory=lambda: {strategy: 0 for strategy in FetchStrategy}
+    failed_strategies: dict[FetchStrategy, int] = field(
+        default_factory=lambda: {strategy: 0 for strategy in FetchStrategy},
     )
-    last_success: Optional[str] = None
-    last_failure: Optional[str] = None
+    last_success: str | None = None
+    last_failure: str | None = None
 
     def record_attempt(self, result: FetchResult, strategy: FetchStrategy):
         """Record fetch attempt results"""
@@ -46,7 +44,7 @@ class StrategyManager:
 
     def __init__(self, config: FetcherConfig):
         self.config = config
-        self._pattern_history: Dict[str, FetchHistory] = {}
+        self._pattern_history: dict[str, FetchHistory] = {}
 
     def get_url_pattern(self, url: str) -> str:
         """Extract pattern from URL for history tracking"""
@@ -89,10 +87,10 @@ class StrategyManager:
 class SmartContentFetcher:
     """Main content fetcher implementation"""
 
-    def __init__(self, config: Optional[FetcherConfig] = None):
+    def __init__(self, config: FetcherConfig | None = None):
         self.config = config or FetcherConfig()
         self.strategy_manager = StrategyManager(self.config)
-        self.strategies: Dict[FetchStrategy, ContentFetchStrategy] = {}
+        self.strategies: dict[FetchStrategy, ContentFetchStrategy] = {}
         self._init_strategies()
 
     def _init_strategies(self):
@@ -121,11 +119,15 @@ class SmartContentFetcher:
                     logger.debug(f"Success with {strategy_type.name} for {url}")
                     return result
                 else:
-                    logger.debug(f"Strategy {strategy_type.name} failed for {url}: {result.error}")
+                    logger.debug(
+                        f"Strategy {strategy_type.name} failed for {url}: {result.error}",  # noqa: E501
+                    )
                     last_error = result.error
 
             except Exception as e:
-                logger.error(f"Error in strategy {strategy_type.name} for {url}: {str(e)}")
+                logger.error(
+                    f"Error in strategy {strategy_type.name} for {url}: {str(e)}",
+                )
                 last_error = str(e)
                 self.strategy_manager.record_attempt(
                     url,
@@ -146,7 +148,10 @@ class SmartContentFetcher:
             error=f"All strategies failed. Last error: {last_error}",
         )
 
-    def _get_strategy_sequence(self, start_strategy: FetchStrategy) -> List[FetchStrategy]:
+    def _get_strategy_sequence(
+        self,
+        start_strategy: FetchStrategy,
+    ) -> list[FetchStrategy]:
         """Get sequence of strategies to try"""
         # Order strategies based on starting point
         all_strategies = list(FetchStrategy)

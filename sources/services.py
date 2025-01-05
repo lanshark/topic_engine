@@ -1,25 +1,18 @@
 # sources/services.py
-import asyncio
+import sys
+from dataclasses import dataclass, field
+from datetime import datetime
+
 import feedparser
 import httpx
-import trafilatura
 import pytz
-from datetime import datetime
-from typing import Dict, List, Optional, Set, Tuple
-from django.utils import timezone
-from django.db import transaction, IntegrityError
-from dataclasses import dataclass, field
-from urllib.parse import urlparse
-from functools import partial
 from asgiref.sync import sync_to_async
-from concurrent.futures import ThreadPoolExecutor
-from logging import LogRecord
-import sys
+from django.utils import timezone
 
 from core.logging import get_logger
-from core.models import Source, Content
-from sources.fetching.types import ContentValidation
-from .fetching import SmartContentFetcher, ContentQuality, FetchResult, FetcherConfig
+from core.models import Content, Source
+
+from .fetching import ContentQuality, SmartContentFetcher
 
 logger = get_logger("topic_engine.services")
 
@@ -38,19 +31,21 @@ class FeedEntry:
 
     title: str
     url: str
-    content: Optional[str]
-    guid: Optional[str]
-    author: Optional[str]
-    published_at: Optional[datetime]
+    content: str | None
+    guid: str | None
+    author: str | None
+    published_at: datetime | None
 
     @classmethod
-    def from_parsed_entry(cls, entry: Dict) -> "FeedEntry":
+    def from_parsed_entry(cls, entry: dict) -> "FeedEntry":
         """Create FeedEntry from feedparser entry"""
         # Extract publication date
         published = entry.get("published_parsed") or entry.get("updated_parsed")
         if published:
             # Create timezone-aware datetime using UTC
-            naive_dt = datetime.fromtimestamp(datetime.timestamp(datetime(*published[:6])))
+            naive_dt = datetime.fromtimestamp(
+                datetime.timestamp(datetime(*published[:6])),
+            )
             published_at = timezone.make_aware(naive_dt, timezone=pytz.UTC)
         else:
             published_at = None
@@ -81,8 +76,8 @@ class FeedEntry:
 class ProcessingResult:
     """Result of processing a feed"""
 
-    new_content: List[Content] = field(default_factory=list)
-    error: Optional[str] = None
+    new_content: list[Content] = field(default_factory=list)
+    error: str | None = None
     processed_count: int = 0
     fetch_failures: int = 0  # Track number of individual fetch failures
     all_attempts_failed: bool = False  # Flag if all fetches failed
@@ -96,18 +91,21 @@ class FeedProcessor:
 
     def __init__(self):
         self.client = httpx.AsyncClient(
-            timeout=HTTP_TIMEOUT, follow_redirects=True  # Enable redirect following
+            timeout=HTTP_TIMEOUT,
+            follow_redirects=True,  # Enable redirect following
         )
         self.fetcher = SmartContentFetcher()
 
-    async def _fetch_feed(self, url: str) -> Optional[feedparser.FeedParserDict]:
+    async def _fetch_feed(self, url: str) -> feedparser.FeedParserDict | None:
         """Fetch and parse RSS feed with improved error handling"""
         try:
             logger.info(f"Fetching feed: {url}")
             response = await self.client.get(url)
             response.raise_for_status()
 
-            logger.info(f"Successfully fetched feed {url} (Status: {response.status_code})")
+            logger.info(
+                f"Successfully fetched feed {url} (Status: {response.status_code})",
+            )
             feed = await sync_to_async(feedparser.parse)(response.text)
 
             if not feed.entries:
@@ -132,11 +130,13 @@ class FeedProcessor:
 
         # Check if source is in backoff period
         if source.error_count >= self.FAILURE_THRESHOLD:
-            if source.last_checked and (timezone.now() - source.last_checked) < timezone.timedelta(
-                minutes=self.BACKOFF_MINUTES
+            if source.last_checked and (
+                timezone.now() - source.last_checked
+            ) < timezone.timedelta(
+                minutes=self.BACKOFF_MINUTES,
             ):
                 logger.warning(
-                    f"Source {source.name} is in backoff period due to {source.error_count} failures. Skipping."
+                    f"Source {source.name} is in backoff period due to {source.error_count} failures. Skipping.",  # noqa: E501
                 )
                 result.error = f"In backoff period due to {source.error_count} failures"
                 return result
@@ -182,7 +182,9 @@ class FeedProcessor:
 
                 # Early failure detection
                 if consecutive_failures >= MAX_CONSECUTIVE_FAILURES:
-                    logger.warning(f"Stopping after {consecutive_failures} consecutive failures")
+                    logger.warning(
+                        f"Stopping after {consecutive_failures} consecutive failures",
+                    )
                     break
 
                 # Check failure rate after minimum attempts
@@ -191,30 +193,34 @@ class FeedProcessor:
                     and failed_attempts / total_attempts > MAX_FAILURE_RATE
                 ):
                     logger.warning(
-                        f"Stopping due to high failure rate: {failed_attempts}/{total_attempts}"
+                        f"Stopping due to high failure rate: {failed_attempts}/{total_attempts}",  # noqa: E501
                     )
                     break
 
             result.fetch_failures = failed_attempts
-            result.all_attempts_failed = failed_attempts == total_attempts and total_attempts > 0
+            result.all_attempts_failed = (
+                failed_attempts == total_attempts and total_attempts > 0
+            )
 
             # Record source status based on fetch success rate
             if result.all_attempts_failed:
                 await self._record_source_failure(
-                    source, f"All {total_attempts} fetch attempts failed"
+                    source,
+                    f"All {total_attempts} fetch attempts failed",
                 )
                 logger.error(
-                    f"Source {source.name} had {failed_attempts}/{total_attempts} failures"
+                    f"Source {source.name} had {failed_attempts}/{total_attempts} failures",  # noqa: E501
                 )
             elif failed_attempts > total_attempts / 2:
-                # Partial failure - record it but don't increment error count as severely
+                # Partial failure - record it but don't
+                # increment error count as severely
                 await self._record_source_failure(
                     source,
-                    f"High failure rate: {failed_attempts}/{total_attempts} attempts failed",
+                    f"High failure rate: {failed_attempts}/{total_attempts} attempts failed",  # noqa: E501
                     increment=0.5,
                 )
                 logger.warning(
-                    f"Source {source.name} had high failure rate: {failed_attempts}/{total_attempts}"
+                    f"Source {source.name} had high failure rate: {failed_attempts}/{total_attempts}",  # noqa: E501
                 )
             else:
                 await self._record_source_success(source)
@@ -227,7 +233,10 @@ class FeedProcessor:
         return result
 
     async def _record_source_failure(
-        self, source: Source, error_message: str, increment: float = 1.0
+        self,
+        source: Source,
+        error_message: str,
+        increment: float = 1.0,
     ):
         """Record a source failure and update error tracking"""
         source.error_count += increment
@@ -255,19 +264,21 @@ class FeedProcessor:
         if source.error_count >= self.FAILURE_THRESHOLD:
             logger.warning(
                 f"Source {source.name} has failed {source.error_count} times. "
-                f"Entering {self.BACKOFF_MINUTES} minute backoff period."
+                f"Entering {self.BACKOFF_MINUTES} minute backoff period.",
             )
 
     async def _record_source_success(self, source: Source):
         """Record a successful source processing"""
         if source.error_count > 0:
-            logger.info(f"Resetting error count for source {source.name} after successful fetch")
+            logger.info(
+                f"Resetting error count for source {source.name} after successful fetch",  # noqa: E501
+            )
         source.error_count = 0
         source.last_checked = timezone.now()
         source.last_success = timezone.now()
         await sync_to_async(source.save)()
 
-    async def _process_entry(self, source: Source, entry: FeedEntry) -> Optional[Content]:
+    async def _process_entry(self, source: Source, entry: FeedEntry) -> Content | None:
         """Process single feed entry with enhanced logging"""
         try:
             # Check for existing content
@@ -283,14 +294,16 @@ class FeedProcessor:
                 f"Fetch result for {entry.url}: "
                 f"quality={fetch_result.quality}, "
                 f"strategy={fetch_result.strategy}, "
-                f"success={fetch_result.success}"
+                f"success={fetch_result.success}",
             )
 
             if not fetch_result.success or fetch_result.quality in (
                 ContentQuality.EMPTY,
                 ContentQuality.BLOCKED,
             ):
-                logger.warning(f"Failed to fetch content for {entry.url}: {fetch_result.error}")
+                logger.warning(
+                    f"Failed to fetch content for {entry.url}: {fetch_result.error}",
+                )
                 return None
 
             content = Content(
@@ -313,7 +326,7 @@ class FeedProcessor:
             logger.info(f"Successfully saved content: {entry.title}")
             return content
 
-        except Exception as e:
+        except Exception:
             logger.exception(f"Error processing entry {entry.url}")
             return None
 

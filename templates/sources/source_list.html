@@ -5,7 +5,7 @@
     <ul class="space-y-1">
         {% for source in sources %}
             <li class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-                <a hx-get="/source/{{ source.id }}/" 
+                <a hx-get="/source/{{ source.id }}/"
                    hx-target="#article-list"
                    class="flex justify-between items-center">
                     <span>{{ source.name }}</span>

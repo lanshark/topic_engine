@@ -1,9 +1,11 @@
 # sources/fetching/types.py
-from dataclasses import dataclass, field
-from enum import Enum, auto
-from typing import List, Pattern, Optional, Dict, Any
-import re
 import logging
+import re
+from dataclasses import dataclass, field
+from enum import Enum
+from re import Pattern
+from typing import Any
+
 from .strategy import FetchStrategy
 
 logger = logging.getLogger(__name__)
@@ -17,21 +19,25 @@ class ContentQuality(Enum):
     EMPTY = "empty"
 
 
-def get_required_patterns() -> List[Pattern]:
+def get_required_patterns() -> list[Pattern]:
     """Factory for required patterns with more lenient matching"""
     return [
         # Match any article-like container
         re.compile(
-            r"<(article|main|div\s+class=['\"][^'\"]*(?:article|post|content)[^'\"]*['\"])[^>]*>"
+            r"<(article|main|div\s+class=['\"][^'\"]*(?:article|post|content)[^'\"]*['\"])[^>]*>",
         ),
         # Match typical content markers
-        re.compile(r'class=["\'][^"\']*(?:content|article|post|story|text)[^"\']*["\']'),
+        re.compile(
+            r'class=["\'][^"\']*(?:content|article|post|story|text)[^"\']*["\']',
+        ),
         # Match article schema
-        re.compile(r'(?:itemtype=["\']http://schema.org/Article["\']|typeof=["\']Article["\'])'),
+        re.compile(
+            r'(?:itemtype=["\']http://schema.org/Article["\']|typeof=["\']Article["\'])',
+        ),
     ]
 
 
-def get_blocked_patterns() -> List[Pattern]:
+def get_blocked_patterns() -> list[Pattern]:
     """Factory for blocked patterns - focus on clear paywall indicators"""
     return [
         re.compile(r"subscribe\s+to\s+continue|subscription\s+required", re.I),
@@ -46,8 +52,8 @@ class ContentValidation:
 
     min_length: int = 100  # Minimum content length
     max_length: int = 2_000_000  # Increased max length
-    required_patterns: List[Pattern] = field(default_factory=get_required_patterns)
-    blocked_patterns: List[Pattern] = field(default_factory=get_blocked_patterns)
+    required_patterns: list[Pattern] = field(default_factory=get_required_patterns)
+    blocked_patterns: list[Pattern] = field(default_factory=get_blocked_patterns)
 
     def validate(self, content: str) -> ContentQuality:
         """Validate content quality with improved logic"""
@@ -104,11 +110,11 @@ class ContentValidation:
 class FetchResult:
     """Result of a content fetch attempt"""
 
-    content: Optional[str]
+    content: str | None
     quality: ContentQuality
-    strategy: Optional[FetchStrategy] = None
-    error: Optional[str] = None
-    metadata: Dict[str, Any] = field(default_factory=dict)
+    strategy: FetchStrategy | None = None
+    error: str | None = None
+    metadata: dict[str, Any] = field(default_factory=dict)
 
     @property
     def success(self) -> bool:

@@ -1,4 +1,3 @@
-import os
 from pathlib import Path
 
 from decouple import Csv, config
@@ -31,7 +30,7 @@ LOGGING = {
         "has_workflow_id": {
             "()": "django.utils.log.CallbackFilter",
             "callback": lambda record: hasattr(record, "workflow_id"),
-        }
+        },
     },
     "handlers": {
         "console": {
@@ -66,7 +65,10 @@ LOGGING = {
         },
         # Topic Engine loggers
         "topic_engine": {
-            "handlers": ["console", "file"],  # Remove workflow_file from default handlers
+            "handlers": [
+                "console",
+                "file",
+            ],  # Remove workflow_file from default handlers
             "level": config("LOG_LEVEL", default="INFO"),
             "propagate": False,
         },
@@ -161,7 +163,7 @@ DATABASES = {
         "PASSWORD": config("POSTGRES_PASSWORD"),
         "HOST": config("POSTGRES_HOST", default="localhost"),
         "PORT": config("POSTGRES_PORT", default="5432"),
-    }
+    },
 }
 
 # Password validation

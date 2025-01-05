@@ -1,16 +1,14 @@
 # sources/management/commands/check_feeds.py
-from django.core.management.base import BaseCommand
-from django.utils import timezone
-from django.db.models import Q
-from django.db import transaction
-from asgiref.sync import sync_to_async
 import asyncio
 import logging
-from asyncio import Semaphore, TimeoutError
-from typing import List, Optional
 import signal
-from contextlib import asynccontextmanager
-from functools import partial
+from asyncio import Semaphore, TimeoutError
+
+from asgiref.sync import sync_to_async
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.db.models import Q
+from django.utils import timezone
 
 from core.models import Source
 from sources.services import FeedProcessor
@@ -26,7 +24,10 @@ class AsyncTimeout:
 
     async def __aenter__(self):
         self.task = asyncio.current_task()
-        self.handle = asyncio.get_running_loop().call_later(self.seconds, self.task.cancel)
+        self.handle = asyncio.get_running_loop().call_later(
+            self.seconds,
+            self.task.cancel,
+        )
         return self
 
     async def __aexit__(self, exc_type, exc_val, exc_tb):
@@ -41,17 +42,27 @@ class Command(BaseCommand):
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._shutdown = False
-        self._tasks: List[asyncio.Task] = []
+        self._tasks: list[asyncio.Task] = []
         self._processor = None
 
     def add_arguments(self, parser):
         parser.add_argument("--once", action="store_true", help="Run once and exit")
-        parser.add_argument("--verbose", action="store_true", help="Increase logging verbosity")
         parser.add_argument(
-            "--concurrency", type=int, default=10, help="Maximum concurrent feed checks"
+            "--verbose",
+            action="store_true",
+            help="Increase logging verbosity",
         )
         parser.add_argument(
-            "--timeout", type=int, default=300, help="Timeout in seconds for each feed check"
+            "--concurrency",
+            type=int,
+            default=10,
+            help="Maximum concurrent feed checks",
+        )
+        parser.add_argument(
+            "--timeout",
+            type=int,
+            default=300,
+            help="Timeout in seconds for each feed check",
         )
 
     def handle_sigterm(self, signum, frame):
@@ -78,12 +89,18 @@ class Command(BaseCommand):
                 .filter(active=True, source_type="rss")
                 .filter(
                     Q(last_checked__isnull=True)
-                    | Q(last_checked__lte=timezone.now() - timezone.timedelta(minutes=5))
-                )
+                    | Q(
+                        last_checked__lte=timezone.now()
+                        - timezone.timedelta(minutes=5),
+                    ),
+                ),
             )
 
     async def process_single_source(
-        self, source: Source, processor: FeedProcessor, timeout: int
+        self,
+        source: Source,
+        processor: FeedProcessor,
+        timeout: int,
     ) -> None:
         """Process a single source with timeout and error handling"""
         try:
@@ -98,7 +115,7 @@ class Command(BaseCommand):
                     logger.info(
                         f"Processed {source.name}: "
                         f"new_content={len(result.new_content)}, "
-                        f"total_processed={result.processed_count}"
+                        f"total_processed={result.processed_count}",
                     )
                     source.error_count = 0
 
@@ -107,7 +124,7 @@ class Command(BaseCommand):
                     source.active = False
                     logger.warning(
                         f"Source {source.name} has failed {source.error_count} times. "
-                        "Deactivating source."
+                        "Deactivating source.",
                     )
 
                 source.last_checked = timezone.now()
@@ -117,7 +134,7 @@ class Command(BaseCommand):
             logger.error(f"Timeout processing source: {source.name}")
             source.error_count = getattr(source, "error_count", 0) + 1
             await sync_to_async(source.save)()
-        except Exception as e:
+        except Exception:
             logger.exception(f"Error processing source {source.name}")
             source.error_count = getattr(source, "error_count", 0) + 1
             await sync_to_async(source.save)()
@@ -169,7 +186,7 @@ class Command(BaseCommand):
 
             await asyncio.gather(*tasks, return_exceptions=True)
 
-        except Exception as e:
+        except Exception:
             logger.exception("Error in process_sources")
             raise
         finally:
@@ -186,10 +203,13 @@ class Command(BaseCommand):
 
         try:
             asyncio.run(
-                self.process_sources(concurrency=options["concurrency"], timeout=options["timeout"])
+                self.process_sources(
+                    concurrency=options["concurrency"],
+                    timeout=options["timeout"],
+                ),
             )
         except SystemExit:
             logger.info("Gracefully shut down")
-        except Exception as e:
+        except Exception:
             logger.exception("Error in main process")
             raise

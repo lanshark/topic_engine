@@ -1,4 +1,3 @@
-# config/settings/test.py
 from .base import *
 
 DATABASES = {
@@ -14,7 +13,7 @@ DATABASES = {
             "SERIALIZE": False,  # Speeds up test runs
         },
         "OPTIONS": {"sslmode": "disable"},
-    }
+    },
 }
 
 # Test runner settings
@@ -41,7 +40,7 @@ PASSWORD_HASHERS = [
 CACHES = {
     "default": {
         "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
-    }
+    },
 }
 
 # Media settings for testing

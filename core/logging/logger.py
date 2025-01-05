@@ -5,7 +5,6 @@ import time
 import uuid
 from contextlib import contextmanager
 from dataclasses import dataclass, field
-from typing import Dict, Optional
 
 
 @dataclass
@@ -15,7 +14,7 @@ class ProcessContext:
     workflow_id: str = field(default_factory=lambda: str(uuid.uuid4())[:8])
     component: str = ""
     start_time: float = field(default_factory=time.time)
-    metadata: Dict = field(default_factory=dict)
+    metadata: dict = field(default_factory=dict)
 
 
 class WorkflowLogger:
@@ -55,7 +54,7 @@ class WorkflowLogger:
         ):
             self.workflow_logger.addHandler(workflow_handler)
 
-    def _get_extra(self, extra: Optional[Dict] = None) -> Dict:
+    def _get_extra(self, extra: dict | None = None) -> dict:
         """Prepare extra dict with workflow context if available"""
         extra_dict = extra.copy() if extra else {}
         if self.context:
@@ -111,7 +110,11 @@ class WorkflowLogger:
             yield self.context
         finally:
             duration = time.time() - self.context.start_time
-            self.debug(f"Completed {component} workflow", duration=f"{duration:.2f}s", **metadata)
+            self.debug(
+                f"Completed {component} workflow",
+                duration=f"{duration:.2f}s",
+                **metadata,
+            )
             self.context = previous_context
 
 

@@ -1,7 +1,7 @@
 # core/views.py
+from django.db.models import Case, F, FloatField, Prefetch, Value, When
 from django.views.generic import ListView
-from django.db.models import Prefetch, Q, F, Case, When, Value, FloatField
-from django.utils import timezone
+
 from .models import Content, Source, TopicPrediction
 
 
@@ -30,7 +30,8 @@ class AllArticlesView(ListView):
         # Filter for high confidence relevant predictions
         if self.request.GET.get("filter") == "relevant":
             queryset = queryset.filter(
-                topicprediction__result="relevant", topicprediction__confidence__gte=0.9
+                topicprediction__result="relevant",
+                topicprediction__confidence__gte=0.9,
             )
 
         # Add predictions with confidence percentage calculated
@@ -43,11 +44,11 @@ class AllArticlesView(ListView):
                         When(confidence__isnull=False, then=F("confidence") * 100),
                         default=Value(0),
                         output_field=FloatField(),
-                    )
+                    ),
                 )
                 .order_by("-created_at"),
                 to_attr="predictions",
-            )
+            ),
         )
 
     def get_context_data(self, **kwargs):

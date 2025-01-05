@@ -1,10 +1,11 @@
 # sources/tests/test_scheduler.py
+from unittest.mock import AsyncMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
-from django.utils import timezone
 from django.core.cache import cache
-from django.test import override_settings
-from core.models import Source, Content, TopicPrediction
+from django.utils import timezone
+
+from core.models import Content, Source
 from sources.scheduler import ContentScheduler
 from sources.tests.conftest import get_unique_url
 
@@ -24,7 +25,7 @@ async def test_scheduler_startup():
         # Mock check_feeds to prevent database access
         with patch.object(scheduler, "check_feeds"):
             await scheduler.start()
-            assert scheduler._running == True
+            assert scheduler._running
             mock_instance.start.assert_called_once()
 
 
@@ -44,7 +45,7 @@ async def test_feed_checking(db, source):
 
 async def test_feed_check_frequency(db):
     """Test feed checking respects frequency"""
-    source = await Source.objects.acreate(
+    await Source.objects.acreate(
         name="Test Source",
         url="http://example2.com/feed",  # Different URL
         source_type="rss",
@@ -63,18 +64,26 @@ async def test_prediction_processing(db):
     """Test prediction processing"""
     with patch("django.core.management.call_command") as mock_call:
         source = await Source.objects.acreate(
-            name="Test Source", url=get_unique_url("pred"), source_type="rss", active=True
+            name="Test Source",
+            url=get_unique_url("pred"),
+            source_type="rss",
+            active=True,
         )
 
         content = await Content.objects.acreate(
-            title="Test Article", url=get_unique_url("article"), source=source
+            title="Test Article",
+            url=get_unique_url("article"),
+            source=source,
         )
 
         cache.set("pending_prediction_content", {str(content.id)})
         scheduler = ContentScheduler()
         await scheduler.process_predictions()
 
-        mock_call.assert_called_once_with("predict_topics", content_ids=[str(content.id)])
+        mock_call.assert_called_once_with(
+            "predict_topics",
+            content_ids=[str(content.id)],
+        )
 
 
 async def test_scheduler_shutdown():
@@ -87,7 +96,7 @@ async def test_scheduler_shutdown():
         await scheduler.stop()
 
         mock_instance.shutdown.assert_called_once()
-        assert scheduler._running == False
+        assert not scheduler._running
 
 
 async def test_empty_feed_check(db):

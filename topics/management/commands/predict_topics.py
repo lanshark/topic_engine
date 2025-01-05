@@ -1,9 +1,9 @@
-from django.core.management.base import BaseCommand
-from django.db import transaction
-from django.db.models import Q, OuterRef, Exists, QuerySet
 import logging
 from pathlib import Path
-from typing import List, Optional
+
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.db.models import Exists, OuterRef, QuerySet
 from setfit import SetFitModel
 
 from core.models import Content, ModelConfig, TopicPrediction
@@ -28,7 +28,9 @@ class Command(BaseCommand):
             help="Minimum confidence threshold for saving predictions",
         )
         parser.add_argument(
-            "--reset", action="store_true", help="Delete existing predictions before running"
+            "--reset",
+            action="store_true",
+            help="Delete existing predictions before running",
         )
         parser.add_argument(
             "--verify",
@@ -36,7 +38,10 @@ class Command(BaseCommand):
             help="Verify all content has predictions after processing",
         )
         parser.add_argument(
-            "--content-ids", nargs="+", type=str, help="List of content IDs to process"
+            "--content-ids",
+            nargs="+",
+            type=str,
+            help="List of content IDs to process",
         )
 
     def _get_unpredicted_content(self, model_config: ModelConfig) -> QuerySet:
@@ -48,7 +53,8 @@ class Command(BaseCommand):
             query = query.filter(id__in=self.content_ids)
 
         has_prediction = TopicPrediction.objects.filter(
-            content=OuterRef("pk"), model_config=model_config
+            content=OuterRef("pk"),
+            model_config=model_config,
         )
 
         return (
@@ -65,7 +71,9 @@ class Command(BaseCommand):
         reset: bool,
         verify: bool,
     ):
-        """Process a single model config with improved error handling and verification"""
+        """
+        Process a single model config with improved error handling and verification
+        """
         logger.info(f"\nStarting processing for model: {model_config.name}")
 
         # Reset existing predictions if requested
@@ -82,7 +90,7 @@ class Command(BaseCommand):
 
             model = SetFitModel.from_pretrained(str(model_path))
             logger.info("Model loaded successfully")
-        except Exception as e:
+        except Exception:
             logger.exception("Error loading model")
             return
 
@@ -106,7 +114,7 @@ class Command(BaseCommand):
                     probs = model.predict_proba(texts)
 
                     predictions = []
-                    for content, prob in zip(batch, probs):
+                    for content, prob in zip(batch, probs, strict=False):
                         confidence = float(max(prob))
                         if confidence >= min_confidence:
                             result = "relevant" if prob[1] >= prob[0] else "irrelevant"
@@ -116,7 +124,7 @@ class Command(BaseCommand):
                                     model_config=model_config,
                                     result=result,
                                     confidence=confidence,
-                                )
+                                ),
                             )
 
                     if predictions:
@@ -127,7 +135,7 @@ class Command(BaseCommand):
 
                     logger.info(f"Processed {processed_count} items total")
 
-            except Exception as e:
+            except Exception:
                 logger.exception(f"Error processing batch after id {last_id}")
                 continue
 
@@ -139,11 +147,15 @@ class Command(BaseCommand):
             else:
                 logger.info("All content has predictions")
 
-        logger.info(f"Finished processing {processed_count} items for {model_config.name}")
+        logger.info(
+            f"Finished processing {processed_count} items for {model_config.name}",
+        )
 
     def handle(self, *args, **options):
         logging.basicConfig(
-            level=logging.INFO, format="%(asctime)s %(levelname)s: %(message)s", datefmt="%H:%M:%S"
+            level=logging.INFO,
+            format="%(asctime)s %(levelname)s: %(message)s",
+            datefmt="%H:%M:%S",
         )
 
         self.content_ids = options.get("content_ids")
