@@ -5,8 +5,8 @@ DATABASES = {
     "default": {
         "ENGINE": "django.contrib.gis.db.backends.postgis",
         "NAME": "topic_engine_test",
-        "USER": "andrew",  # Replace with your database user
-        "PASSWORD": "pluto9",  # Replace with your database password
+        "USER": "test",  # Replace with your database user
+        "PASSWORD": "CHANGE_ME!",  # Replace with your database password
         "HOST": "localhost",
         "PORT": "5432",
         "TEST": {

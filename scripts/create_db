@@ -1,0 +1,18 @@
+#!/bin/bash
+
+# NOTE: this assumes that you have already created a user 'topic_engine'
+# 
+# sudo -u postgres psql << EOF
+#     CREATE USER topic_engine PASSWORD 'mypassword';
+#
+sudo -u postgres psql << EOF
+    DROP DATABASE IF EXISTS topic_engine;
+    CREATE DATABASE topic_engine ENCODING='UTF-8' OWNER topic_engine;
+    \c topic_engine
+    CREATE EXTENSION postgis;
+    CREATE EXTENSION postgis_topology;
+    ALTER DATABASE topic_engine OWNER TO topic_engine;
+    GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO topic_engine;
+    GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO topic_engine;
+    GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO topic_engine;
+EOF

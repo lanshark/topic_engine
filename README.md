@@ -42,31 +42,62 @@ Key components include:
 
 ### Prerequisites
 
-- Python 3.10+
-- PostgreSQL 13+ with PostGIS
+- Python 3.12+
+- PostgreSQL 15+ with PostGIS
 - Redis (for caching and async tasks)
 
 ### Quick Start
 
 1. Clone the repository:
 ```bash
-git clone https://github.com/yourusername/topic-engine.git
-cd topic-engine
+git clone https://github.com/NimbleMachine-andrew/topic_engine.git
+cd topic_engine
 ```
 
-2. Install dependencies:
+2. We use [UV](https://docs.astral.sh/uv/) to Manage dependencies:
 ```bash
-pip install -r requirements.txt
+uv venv
+uv sync
 ```
 
-3. Set up the database:
+3. Create a .env file.
+
+    Copy the env-example to .env, edit for your values.
+
+
+4. Create a postgres/postgis database for the application:
+
+    Create a User:
+
 ```bash
-python manage.py migrate
+    sudo -u postgres psql << EOF
+        CREATE USER topic_engine WITH PASSWORD 'mypassword';
+    EOF
 ```
 
-4. Run the development server:
 ```bash
-python manage.py runserver
+    sudo -u postgres psql << EOF 
+        DROP DATABASE IF EXISTS topic_engine;
+        CREATE DATABASE topic_engine ENCODING='UTF-8' OWNER topic_engine;
+        \c topic_engine
+        CREATE EXTENSION postgis;
+        CREATE EXTENSION postgis_topology;
+        ALTER DATABASE topic_engine OWNER TO topic_engine;
+        GRANT ALL PRIVILEGES ON ALL TABLES IN SCHEMA public TO topic_engine;
+        GRANT ALL PRIVILEGES ON ALL SEQUENCES IN SCHEMA public TO topic_engine;
+        GRANT ALL PRIVILEGES ON ALL FUNCTIONS IN SCHEMA public TO topic_engine;
+    EOF
+```
+
+
+5. Set up the database:
+```bash
+uv run manage.py migrate
+```
+
+6. Run the development server:
+```bash
+uv run manage.py runserver
 ```
 
 ## 🤝 Contributing
@@ -110,7 +141,7 @@ We chose the AGPL to:
 
 ## 📋 Roadmap
 
-Check our [Project Board](https://github.com/yourusername/topic-engine/projects/1) for current development priorities.
+Check our [Project Board](https://github.com/NimbleMachine-andrew/topic_engine/projects/1) for current development priorities.
 
 Near-term goals:
 - [ ] Improve documentation and examples
@@ -129,4 +160,4 @@ The Topic Engine builds on many excellent open source projects and ideas. Specia
 
 ## 🤔 Questions?
 
-Feel free to [open an issue](https://github.com/yourusername/topic-engine/issues) or join our community channels. We're here to help!
+Feel free to [open an issue](https://github.com/NimbleMachine-andrew/topic_engine/issues) or join our community channels. We're here to help!
