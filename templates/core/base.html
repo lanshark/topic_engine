@@ -1,3 +1,4 @@
+{% load static %}
 <!DOCTYPE html>
 <html>
 <head>
@@ -5,206 +6,206 @@
     <script src="https://unpkg.com/htmx.org@1.6.1"></script>
     <script src="https://unpkg.com/split.js@1.6.5"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-    	<!-- NOTE: Move this to a css file -->
-        .gutter {
-            background-color: #eee;
-            background-repeat: no-repeat;
-            background-position: 50%;
-        }
-        .gutter.gutter-horizontal {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
-            cursor: col-resize;
-        }
-        .gutter.gutter-vertical {
-            background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
-            cursor: row-resize;
-        }
-        .split {
-            display: flex;
-        }
-        .split.vertical {
-            flex-direction: column;
-        }
+    <script src="{% static 'js/menu.js'%}"></script>
+<style>
+# NOTE: These styles MUST be in the same file as the split.js
+    .gutter {
+        background-color: #eee;
+        background-repeat: no-repeat;
+        background-position: 50%;
+    }
+    .gutter.gutter-horizontal {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAUAAAAeCAYAAADkftS9AAAAIklEQVQoU2M4c+bMfxAGAgYYmwGrIIiDjrELjpo5aiZeMwF+yNnOs5KSvgAAAABJRU5ErkJggg==');
+        cursor: col-resize;
+    }
+    .gutter.gutter-vertical {
+        background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAFAQMAAABo7865AAAABlBMVEVHcEzMzMzyAv2sAAAAAXRSTlMAQObYZgAAABBJREFUeF5jOAMEEAIEEFwAn3kMwcB6I2AAAAAASUVORK5CYII=');
+        cursor: row-resize;
+    }
+    .split {
+        display: flex;
+    }
+    .split.vertical {
+        flex-direction: column;
+    }
 
-        /* Base styles */
-        .article-detail {
-            max-width: 1200px;
-            margin: 0 auto;
-            color: #1a1a1a;
-        }
-        .dark .article-detail {
-            color: #e5e7eb;
-        }
+    /* Base styles */
+    .article-detail {
+        max-width: 1200px;
+        margin: 0 auto;
+        color: #1a1a1a;
+    }
+    .dark .article-detail {
+        color: #e5e7eb;
+    }
         
-        section {
-            margin-bottom: 1.5rem;
-            padding: 1rem;
-            border: 1px solid #e5e7eb;
-            border-radius: 4px;
-            background: white;
-        }
-        .dark section {
-            background: #374151;
-            border-color: #4b5563;
-        }
-        
-        dl {
-            display: grid;
-            grid-template-columns: 120px 1fr;
-            gap: 0.5rem;
-        }
-        dt {
-            font-weight: bold;
-            color: #4b5563;
-        }
-        .dark dt {
-            color: #9ca3af;
-        }
-        dd {
-            color: #1f2937;
-        }
-        .dark dd {
-            color: #e5e7eb;
-        }
-        
-        .content-box {
-            padding: 1rem;
-            background: #f3f4f6;
-            border-radius: 4px;
-            white-space: pre-wrap;
-        }
-        .dark .content-box {
-            background: #1f2937;
-            color: #e5e7eb;
-        }
-        
-        /* Button styles */
-        .btn {
-            padding: 0.5rem 1rem;
-            margin-right: 0.5rem;
-            border-radius: 4px;
-            border: none;
-            cursor: pointer;
-            font-weight: 500;
-        }
-        .btn-success { 
-            background: #059669; 
-            color: white; 
-        }
-        .btn-danger { 
-            background: #dc2626; 
-            color: white; 
-        }
-        .dark .btn-success:hover { 
-            background: #047857; 
-        }
-        .dark .btn-danger:hover { 
-            background: #b91c1c; 
-        }
+    section {
+        margin-bottom: 1.5rem;
+        padding: 1rem;
+        border: 1px solid #e5e7eb;
+        border-radius: 4px;
+        background: white;
+    }
+    .dark section {
+        background: #374151;
+        border-color: #4b5563;
+    }
+    
+    dl {
+        display: grid;
+        grid-template-columns: 120px 1fr;
+        gap: 0.5rem;
+    }
+    dt {
+        font-weight: bold;
+        color: #4b5563;
+    }
+    .dark dt {
+        color: #9ca3af;
+    }
+    dd {
+        color: #1f2937;
+    }
+    .dark dd {
+        color: #e5e7eb;
+    }
+    
+    .content-box {
+        padding: 1rem;
+        background: #f3f4f6;
+        border-radius: 4px;
+        white-space: pre-wrap;
+    }
+    .dark .content-box {
+        background: #1f2937;
+        color: #e5e7eb;
+    }
+    
+    /* Button styles */
+    .btn {
+        padding: 0.5rem 1rem;
+        margin-right: 0.5rem;
+        border-radius: 4px;
+        border: none;
+        cursor: pointer;
+        font-weight: 500;
+    }
+    .btn-success { 
+        background: #059669; 
+        color: white; 
+    }
+    .btn-danger { 
+        background: #dc2626; 
+        color: white; 
+    }
+    .dark .btn-success:hover { 
+        background: #047857; 
+    }
+    .dark .btn-danger:hover { 
+        background: #b91c1c; 
+    }
 
-        /* Links */
-        a {
-            color: #2563eb;
-            text-decoration: none;
-        }
-        .dark a {
-            color: #60a5fa;
-        }
-        a:hover {
-            text-decoration: underline;
-        }
+    /* Links */
+    a {
+        color: #2563eb;
+        text-decoration: none;
+    }
+    .dark a {
+        color: #60a5fa;
+    }
+    a:hover {
+        text-decoration: underline;
+    }
 
-        /* Base layout */
-        #main-container {
-            display: flex;
-            height: calc(100vh - 4rem); /* Account for header height */
-        }
+    /* Base layout */
+    #main-container {
+        display: flex;
+        height: calc(100vh - 4rem); /* Account for header height */
+    }
 
-        /* Left pane */
-        #left-pane {
-            width: 300px;
-            border-right: 1px solid #e5e7eb;
-            background-color: #f8fafc;
-            /* Add these properties */
-            height: 100%;
-            overflow-y: auto;
-        }
+    /* Left pane */
+    #left-pane {
+        width: 300px;
+        border-right: 1px solid #e5e7eb;
+        background-color: #f8fafc;
+        /* Add these properties */
+        height: 100%;
+        overflow-y: auto;
+    }
 
-        /* Source list specific */
-        #source-list {
-            padding: 1rem;
-        }
+    /* Source list specific */
+    #source-list {
+        padding: 1rem;
+    }
 
-        .dark #left-pane {
-            background-color: #1e293b;
-            border-right-color: #4b5563;
-        }
+    .dark #left-pane {
+        background-color: #1e293b;
+        border-right-color: #4b5563;
+    }
 
-        /* Right pane layout */
-        #right-pane {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-        }
+    /* Right pane layout */
+    #right-pane {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+    }
 
-        /* Article list */
-        #article-list {
-            height: 40%;
-            overflow-y: auto;
-            border-bottom: 1px solid #e5e7eb;
-            background-color: #ffffff;
-        }
+    /* Article list */
+    #article-list {
+        height: 40%;
+        overflow-y: auto;
+        border-bottom: 1px solid #e5e7eb;
+        background-color: #ffffff;
+    }
 
-        .dark #article-list {
-            background-color: #334155;
-            border-bottom-color: #4b5563;
-        }
+    .dark #article-list {
+        background-color: #334155;
+        border-bottom-color: #4b5563;
+    }
 
-        /* Article detail */
-        #article-detail {
-            height: 60%;
-            overflow-y: auto;
-            background-color: #f1f5f9;
-        }
+    /* Article detail */
+    #article-detail {
+        height: 60%;
+        overflow-y: auto;
+        background-color: #f1f5f9;
+    }
 
-        .dark #article-detail {
-            background-color: #0f172a;
-        }
+    .dark #article-detail {
+        background-color: #0f172a;
+    }
 
-        /* Gutter styling */
-        .gutter {
-            background-color: #e5e7eb;
-        }
+    /* Gutter styling */
+    .gutter {
+        background-color: #e5e7eb;
+    }
 
-        .dark .gutter {
-            background-color: #4b5563;
-        }
+    .dark .gutter {
+        background-color: #4b5563;
+    }
 
-        /* Add to existing styles */
-        .ag-theme-alpine {
-            --ag-foreground-color: rgb(31, 41, 55);
-            --ag-background-color: rgb(255, 255, 255);
-            --ag-header-background-color: rgb(243, 244, 246);
-            --ag-odd-row-background-color: rgb(249, 250, 251);
-        }
+    /* Add to existing styles */
+    .ag-theme-alpine {
+        --ag-foreground-color: rgb(31, 41, 55);
+        --ag-background-color: rgb(255, 255, 255);
+        --ag-header-background-color: rgb(243, 244, 246);
+        --ag-odd-row-background-color: rgb(249, 250, 251);
+    }
 
-        .dark .ag-theme-alpine {
-            --ag-foreground-color: rgb(229, 231, 235);
-            --ag-background-color: rgb(31, 41, 55);
-            --ag-header-background-color: rgb(17, 24, 39);
-            --ag-odd-row-background-color: rgb(55, 65, 81);
-        }
-
-    </style>
+    .dark .ag-theme-alpine {
+        --ag-foreground-color: rgb(229, 231, 235);
+        --ag-background-color: rgb(31, 41, 55);
+        --ag-header-background-color: rgb(17, 24, 39);
+        --ag-odd-row-background-color: rgb(55, 65, 81);
+    }
+</style>
 </head>
 <body class="bg-gray-100 dark:bg-gray-900">
     <header class="bg-white dark:bg-gray-800 shadow-md p-4">
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Topic Engine</h1>
+      {% include 'nav.html' %}
     </header>
 
     <div id="main-container">
-	<!-- NOTE: put menu block here... -->
+
         <!-- Source List -->
         <div id="left-pane">
             <div id="source-list" class="pane">
@@ -222,8 +223,6 @@
             </div>
         </div>
     </div>
-
-    <!-- NOTE: Move this to a js file. -->
     <script>
         Split(['#left-pane', '#right-pane'], {
             sizes: [20, 80],
@@ -238,5 +237,6 @@
             gutterSize: 8,
         });
     </script>
+
 </body>
 </html>
