@@ -3,12 +3,12 @@
         "model": "core.topic",
         "pk": "fd6d0228-3cd5-4672-8a3c-f33b389e6545",
         "fields": {
-            "name": "Traffic Accidents",
-            "slug": "accidents",
-            "description": "Traffic accidents, collisions, and crashes including fatalities, injuries, and property damage",
+            "name": "Personal AI",
+            "slug": "personal_ai",
+            "description": "Personal Artificial Intelligence",
             "parent": null,
             "templates": {},
-            "path": "accidents",
+            "path": "personal_ai",
             "depth": 0,
             "created_at": "2024-03-20T00:00:00Z",
             "updated_at": "2024-03-20T00:00:00Z"
