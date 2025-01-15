@@ -9,8 +9,8 @@ from setfit import SetFitModel, Trainer, TrainingArguments
 from core.models import ModelConfig
 
 # Constants
-TRAINING_DATA_DIR = os.path.join(settings.BASE_DIR, "topics", "training_data")
-MODEL_SAVE_DIR = os.path.join(settings.BASE_DIR, "topics", "setfit_models")
+TRAINING_DATA_DIR = os.path.join(settings.DATA_DIR, "topics", "training_data")
+MODEL_SAVE_DIR = os.path.join(settings.DATA_DIR, "topics", "setfit_models")
 
 # Recommended models
 SUGGESTED_MODELS = {

@@ -278,7 +278,7 @@ class ModelConfig(BaseModel):
 
     def get_model_path(self) -> str:
         """Get path where model should be stored"""
-        return os.path.join(settings.BASE_DIR, "topics", "setfit_models", self.name)
+        return os.path.join(settings.DATA_DIR, "topics", "setfit_models", self.name)
 
 
 # NOTE: this should be in topics/models.py
