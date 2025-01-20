@@ -1,9 +1,9 @@
-from django.core.management.base import BaseCommand
-from django.db import transaction
-from django.db.models import Q, OuterRef, Exists, QuerySet
 import logging
 from pathlib import Path
-from typing import List, Optional
+
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.db.models import Exists, OuterRef, QuerySet
 from setfit import SetFitModel
 
 from core.models import Content, ModelConfig, TopicPrediction
@@ -74,7 +74,6 @@ class Command(BaseCommand):
             TopicPrediction.objects.filter(model_config=model_config).delete()
             logger.info(f"Deleted {count} existing predictions")
 
-        # Load model
         try:
             model_path = Path(model_config.get_model_path())
             if not model_path.exists():
@@ -83,7 +82,7 @@ class Command(BaseCommand):
             model = SetFitModel.from_pretrained(str(model_path))
             logger.info("Model loaded successfully")
         except Exception as e:
-            logger.exception("Error loading model")
+            logger.exception(f"Error {e} loading model")
             return
 
         # Process content in batches with cursor-based pagination
@@ -128,7 +127,7 @@ class Command(BaseCommand):
                     logger.info(f"Processed {processed_count} items total")
 
             except Exception as e:
-                logger.exception(f"Error processing batch after id {last_id}")
+                logger.exception(f"Error {e} processing batch after id {last_id}")
                 continue
 
         if verify:

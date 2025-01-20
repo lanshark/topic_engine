@@ -1,8 +1,9 @@
-import os
+from pathlib import Path
 
+from django.conf import settings
 from django.core.management.base import BaseCommand
 
-BASE_TRAINING_PATH = "training_data"
+BASE_TRAINING_PATH = Path(settings.DATA_DIR, "training_data")
 
 
 class Command(BaseCommand):
@@ -20,10 +21,11 @@ class Command(BaseCommand):
         label = options["label"]
         headline = options["headline"]
 
-        training_file = os.path.join(BASE_TRAINING_PATH, topic, f"{label}.txt")
+        training_dir = BASE_TRAINING_PATH / topic
+        training_file = training_dir / f"{label}.txt"
 
         # Ensure the setup directory exists
-        if not os.path.isdir(os.path.join(BASE_TRAINING_PATH, topic)):
+        if not training_dir.exists():
             self.stderr.write(self.style.ERROR(f"Topic directory '{topic}' does not exist."))
             return
 
@@ -32,5 +34,6 @@ class Command(BaseCommand):
             file.write(headline + "\n")
 
         self.stdout.write(
+            # SAS - why not print or logger?
             self.style.SUCCESS(f"Successfully added headline to {label} data in setup {topic}.")
         )

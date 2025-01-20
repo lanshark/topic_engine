@@ -1,7 +1,7 @@
-import os
 import uuid
 from datetime import datetime, timedelta
-from typing import Any, Dict, List, Optional
+from pathlib import Path
+from typing import Any, Dict, List
 
 from django.conf import settings
 from django.contrib.gis.db import models as gis_models
@@ -249,7 +249,7 @@ class Content(BaseModel):
 class ModelConfig(BaseModel):
     """Configuration for SetFit models used in predictions"""
 
-    def get_default_params():
+    def get_default_params(self):
         return {"model_type": "medium", "num_epochs": 2, "num_iterations": 20, "batch_size": 16}
 
     name = models.CharField(max_length=200, unique=True)
@@ -278,7 +278,8 @@ class ModelConfig(BaseModel):
 
     def get_model_path(self) -> str:
         """Get path where model should be stored"""
-        return os.path.join(settings.DATA_DIR, "topics", "setfit_models", self.name)
+        model_path = Path(settings.DATA_DIR, "setfit_models", self.name)
+        return str(model_path)
 
 
 # NOTE: this should be in topics/models.py
