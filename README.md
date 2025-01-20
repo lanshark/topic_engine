@@ -89,13 +89,21 @@ uv sync
     EOF
 ```
 
-
 5. Set up the database:
 ```bash
 uv run manage.py migrate
 ```
 
-6. Run the development server:
+6. Pre-load the data:
+```bash
+./manage.py loaddata initial_topics
+./manage.py loaddata initial_model_configs
+./manage.py train_setfit_model personal_ai_medium
+./manage.py predict_topics  (also takes a batch-size parameter:  --batch-size=50)
+
+```
+
+7. Run the development server:
 ```bash
 uv run manage.py runserver
 ```

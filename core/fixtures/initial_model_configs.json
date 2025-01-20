@@ -3,8 +3,8 @@
         "model": "core.modelconfig",
         "pk": "550e8400-e29b-41d4-a716-446655440000",
         "fields": {
-            "name": "accidents_medium",
-            "description": "Traffic accident classifier using medium-sized model",
+            "name": "personal_ai_medium",
+            "description": "Personal AI using medium-sized model",
             "topic": "fd6d0228-3cd5-4672-8a3c-f33b389e6545",
             "parameters": {
                 "model_type": "medium",
