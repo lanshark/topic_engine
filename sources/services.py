@@ -1,25 +1,21 @@
 # sources/services.py
-import asyncio
+import sys
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass, field
+from datetime import datetime
+from functools import partial
+from typing import Dict, List, Optional, Set, Tuple
+
 import feedparser
 import httpx
-import trafilatura
 import pytz
-from datetime import datetime
-from typing import Dict, List, Optional, Set, Tuple
-from django.utils import timezone
-from django.db import transaction, IntegrityError
-from dataclasses import dataclass, field
-from urllib.parse import urlparse
-from functools import partial
 from asgiref.sync import sync_to_async
-from concurrent.futures import ThreadPoolExecutor
-from logging import LogRecord
-import sys
+from django.utils import timezone
 
 from core.logging import get_logger
-from core.models import Source, Content
-from sources.fetching.types import ContentValidation
-from .fetching import SmartContentFetcher, ContentQuality, FetchResult, FetcherConfig
+from core.models import Content, Source
+
+from .fetching import ContentQuality, SmartContentFetcher
 
 logger = get_logger("topic_engine.services")
 

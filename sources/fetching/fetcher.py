@@ -1,17 +1,16 @@
 # sources/fetching/fetcher.py
-from typing import Dict, List, Optional
 import logging
-import asyncio
 from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Dict, List, Optional
 
-from .types import ContentQuality, ContentValidation, FetchResult
-from .strategy import FetchStrategy
 from .config import FetcherConfig
-from .strategies.base import ContentFetchStrategy
-from .strategies.simple import SimpleHttpStrategy
-from .strategies.browser import BrowserStrategy
 from .strategies.archive import ArchiveStrategy
+from .strategies.base import ContentFetchStrategy
+from .strategies.browser import BrowserStrategy
+from .strategies.simple import SimpleHttpStrategy
+from .strategy import FetchStrategy
+from .types import ContentQuality, FetchResult
 
 logger = logging.getLogger(__name__)
 

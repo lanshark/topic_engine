@@ -1,6 +1,5 @@
 # core/views.py
 from django.db.models import Case, F, FloatField, Prefetch, Q, Value, When
-from django.utils import timezone
 from django.views.generic import ListView
 
 from .models import Content, Source, TopicPrediction
