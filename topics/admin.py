@@ -1,6 +1,6 @@
 from django.contrib import admin
 
-from .models import Topic, TopicPrediction
+from core.models import Topic, TopicPrediction
 
 
 @admin.register(Topic)

@@ -2,9 +2,7 @@
 from django.db.models import Case, F, FloatField, Prefetch, Value, When
 from django.views.generic import ListView
 
-from topics.models import TopicPrediction
-
-from .models import Content, Source
+from .models import Content, Source, TopicPrediction
 
 
 class AllArticlesView(ListView):

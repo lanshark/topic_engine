@@ -4,9 +4,7 @@ from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
 
-from core.models import Content, Source
-
-from topics.models TopicPrediction
+from core.models import Content, Source, TopicPrediction
 
 
 class UUIDEncoder(DjangoJSONEncoder):

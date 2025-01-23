@@ -3,8 +3,9 @@ from pathlib import Path
 from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
+from django.views.generic.list import ListView
 
-from core.models import Content
+from core.models import Content, Topic
 
 BASE_TRAINING_PATH = Path(settings.DATA_DIR, "training_data")
 DEFAULT_TOPIC = ""
@@ -29,3 +30,12 @@ def add_training_data(request, article_id):
         return JsonResponse({"status": "success", "action": action})
 
     return JsonResponse({"status": "failed"})
+
+
+class TopicListView(ListView):
+    model = Topic
+    paginate_by = 100  # if pagination is desired
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

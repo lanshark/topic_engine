@@ -6,8 +6,7 @@ from django.test import TestCase
 from django.utils import timezone
 
 from core.admin import process_opml_file
-from core.models import Content, Source
-from topics.models import Topic, TopicPrediction
+from core.models import Content, Source, Topic, TopicPrediction
 
 
 class SourceModelTests(TestCase):

@@ -6,8 +6,7 @@ from django.db import transaction
 from django.db.models import Exists, OuterRef, QuerySet
 from setfit import SetFitModel
 
-from core.models import Content, ModelConfig
-from topics.models import TopicPrediction
+from core.models import Content, ModelConfig, TopicPrediction
 
 logger = logging.getLogger(__name__)
 
