@@ -3,7 +3,6 @@ import xml.etree.ElementTree as ET
 from typing import Dict, List
 
 from django.core.management.base import BaseCommand, CommandError
-from django.utils.text import slugify
 
 from core.models import Source
 
@@ -37,7 +36,7 @@ class Command(BaseCommand):
             categories = []
             self._process_outline(body, categories, feeds)
 
-            self.stdout.write(f"Found {len(feeds)} feeds in OPML file")
+            logger.info(f"Found {len(feeds)} feeds in OPML file")
 
             if options["dry_run"]:
                 self._show_feeds(feeds)
@@ -46,7 +45,7 @@ class Command(BaseCommand):
             # Import feeds
             imported, skipped = self._import_feeds(feeds)
 
-            self.stdout.write(
+            logger.info(
                 self.style.SUCCESS(
                     f"Successfully imported {imported} feeds, skipped {skipped} existing feeds"
                 )
@@ -83,20 +82,20 @@ class Command(BaseCommand):
 
     def _show_feeds(self, feeds: List[Dict]):
         """Display feeds that would be imported"""
-        self.stdout.write("\nFeeds found in OPML file:")
+        logger.info("\nFeeds found in OPML file:")
         current_category = None
 
         for feed in sorted(feeds, key=lambda x: (x["category"], x["name"])):
             # Print category header if changed
             if feed["category"] != current_category:
                 current_category = feed["category"]
-                self.stdout.write(f"\nCategory: {current_category or 'Uncategorized'}")
-                self.stdout.write("-" * 40)
+                logger.info(f"\nCategory: {current_category or 'Uncategorized'}")
+                logger.info("-" * 40)
 
-            self.stdout.write(f"\nName: {feed['name']}")
-            self.stdout.write(f"URL: {feed['url']}")
+            logger.info(f"\nName: {feed['name']}")
+            logger.info(f"URL: {feed['url']}")
             if feed["html_url"]:
-                self.stdout.write(f"Website: {feed['html_url']}")
+                logger.info(f"Website: {feed['html_url']}")
 
     def _import_feeds(self, feeds: List[Dict]) -> tuple[int, int]:
         """Import feeds into database"""
@@ -117,12 +116,12 @@ class Command(BaseCommand):
 
                 if created:
                     imported += 1
-                    self.stdout.write(f"Imported: {feed['name']}")
+                    logger.info(f"Imported: {feed['name']}")
                 else:
                     skipped += 1
-                    self.stdout.write(f"Skipped existing: {feed['name']}")
+                    logger.info(f"Skipped existing: {feed['name']}")
 
             except Exception as e:
-                self.stdout.write(self.style.ERROR(f"Error importing {feed['url']}: {str(e)}"))
+                logger.info(self.style.ERROR(f"Error importing {feed['url']}: {str(e)}"))
 
         return imported, skipped

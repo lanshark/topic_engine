@@ -1,15 +1,15 @@
 # sources/scheduler.py
+import logging
+
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from apscheduler.triggers.interval import IntervalTrigger
-from django.utils import timezone
-from django.db import transaction
 from django.core.cache import cache
 from django.core.management import call_command
-import asyncio
-import logging
 from django.db.models import Q
+from django.utils import timezone
 
 from core.models import Source
+
 from .services import FeedProcessor
 
 logger = logging.getLogger(__name__)

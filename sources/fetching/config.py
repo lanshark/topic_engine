@@ -1,8 +1,7 @@
 # sources/fetching/config.py
 from dataclasses import dataclass, field
 from datetime import timedelta
-import re
-from typing import Dict, List, Pattern
+from typing import Dict, List
 
 from sources.fetching.types import ContentValidation
 

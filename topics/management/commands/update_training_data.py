@@ -1,7 +1,10 @@
+import logging
 from pathlib import Path
 
 from django.conf import settings
 from django.core.management.base import BaseCommand
+
+logger = logging.getLogger(__name__)
 
 BASE_TRAINING_PATH = Path(settings.DATA_DIR, "training_data")
 
@@ -26,14 +29,13 @@ class Command(BaseCommand):
 
         # Ensure the setup directory exists
         if not training_dir.exists():
-            self.stderr.write(self.style.ERROR(f"Topic directory '{topic}' does not exist."))
+            logger.info(self.style.ERROR(f"Topic directory '{topic}' does not exist."))
             return
 
         # Append the headline to the correct file
         with open(training_file, "a") as file:
             file.write(headline + "\n")
 
-        self.stdout.write(
-            # SAS - why not print or logger?
+        logger.info(
             self.style.SUCCESS(f"Successfully added headline to {label} data in setup {topic}.")
         )

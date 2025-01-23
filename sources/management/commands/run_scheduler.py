@@ -1,9 +1,12 @@
 # management/commands/run_scheduler.py
 import asyncio
+import logging
 
 from django.core.management.base import BaseCommand
 
 from sources.scheduler import ContentScheduler
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -15,9 +18,9 @@ class Command(BaseCommand):
 
         try:
             loop.run_until_complete(scheduler.start())
-            self.stdout.write("Scheduler started. Press Ctrl+C to stop.")
+            logger.info("Scheduler started. Press Ctrl+C to stop.")
             loop.run_forever()
         except KeyboardInterrupt:
-            self.stdout.write("Shutting down scheduler...")
+            logger.info("Shutting down scheduler...")
             loop.run_until_complete(scheduler.stop())
             loop.close()

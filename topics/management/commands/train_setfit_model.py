@@ -8,6 +8,8 @@ from setfit import SetFitModel, Trainer, TrainingArguments
 
 from core.models import ModelConfig
 
+logger = logging.getLogger(__name__)
+
 # Constants
 TRAINING_DATA_DIR = Path(settings.DATA_DIR, "training_data")
 MODEL_SAVE_DIR = Path(settings.DATA_DIR, "setfit_models")
@@ -52,8 +54,7 @@ class Command(BaseCommand):
                     texts.append(line)
                     labels.append(0)
 
-        # SAS - why not just print or logger?
-        self.stdout.write(self.style.SUCCESS(f"Loaded {len(texts)} examples from {topic_path}"))
+        logger.info(self.style.SUCCESS(f"Loaded {len(texts)} examples from {topic_path}"))
 
         return Dataset.from_dict({"text": texts, "label": labels})
 
@@ -62,8 +63,7 @@ class Command(BaseCommand):
         try:
             model_config = ModelConfig.objects.get(name=model_name)
         except ModelConfig.DoesNotExist:
-            # SAS - why not just print or logger?
-            self.stderr.write(self.style.ERROR(f"Model config '{model_name}' not found"))
+            logger.info(self.style.ERROR(f"Model config '{model_name}' not found"))
             return
 
         # Load and split data
@@ -73,8 +73,7 @@ class Command(BaseCommand):
         # Configure model
         model_type = model_config.parameters.get("model_type", "medium")
         base_model = SUGGESTED_MODELS.get(model_type, SUGGESTED_MODELS["medium"])
-        # SAS - why not just print or logger?
-        self.stdout.write(f"Using base model: {base_model}")
+        logger.info(f"Using base model: {base_model}")
 
         # Initialize model
         model = SetFitModel.from_pretrained(base_model)
@@ -99,12 +98,11 @@ class Command(BaseCommand):
 
         # Calculate and display training info
         total_steps = (len(dataset["train"]) // batch_size) * num_epochs
-        # SAS - why not just print or logger?
-        self.stdout.write("\nTraining with:")
-        self.stdout.write(f"- Batch size: {batch_size}")
-        self.stdout.write(f"- Epochs: {num_epochs}")
-        self.stdout.write(f"- Iterations: {num_iterations}")
-        self.stdout.write(f"- Total steps: {total_steps}")
+        logger.info("\nTraining with:")
+        logger.info(f"- Batch size: {batch_size}")
+        logger.info(f"- Epochs: {num_epochs}")
+        logger.info(f"- Iterations: {num_iterations}")
+        logger.info(f"- Total steps: {total_steps}")
 
         # Create trainer
         trainer = Trainer(
@@ -115,8 +113,7 @@ class Command(BaseCommand):
         )
 
         # Train model
-        # SAS - why not just print or logger?
-        self.stdout.write("Starting training...")
+        logger.info("Starting training...")
         trainer.train()
 
         # Evaluate
@@ -132,5 +129,4 @@ class Command(BaseCommand):
         # Update metrics
         model_config.update_training_metrics(num_examples=len(dataset["train"]), accuracy=accuracy)
 
-        # SAS - why not just print or logger?
-        self.stdout.write(self.style.SUCCESS(f"Model trained and saved. Accuracy: {accuracy:.3f}"))
+        logger.info(self.style.SUCCESS(f"Model trained and saved. Accuracy: {accuracy:.3f}"))

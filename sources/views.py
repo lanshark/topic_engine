@@ -1,4 +1,3 @@
-import json
 import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder

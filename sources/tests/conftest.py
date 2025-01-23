@@ -1,8 +1,10 @@
 # sources/tests/conftest.py
-import pytest
 from unittest.mock import patch
+
+import pytest
 from django.utils import timezone
-from core.models import Source, Content
+
+from core.models import Content, Source
 
 
 def get_unique_url(prefix="test"):

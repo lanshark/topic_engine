@@ -1,16 +1,15 @@
 # sources/management/commands/check_feeds.py
-from django.core.management.base import BaseCommand
-from django.utils import timezone
-from django.db.models import Q
-from django.db import transaction
-from asgiref.sync import sync_to_async
 import asyncio
 import logging
-from asyncio import Semaphore, TimeoutError
-from typing import List, Optional
 import signal
-from contextlib import asynccontextmanager
-from functools import partial
+from asyncio import Semaphore, TimeoutError
+from typing import List
+
+from asgiref.sync import sync_to_async
+from django.core.management.base import BaseCommand
+from django.db import transaction
+from django.db.models import Q
+from django.utils import timezone
 
 from core.models import Source
 from sources.services import FeedProcessor

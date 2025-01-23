@@ -1,10 +1,12 @@
 # sources/tests/test_scheduler.py
+from unittest.mock import AsyncMock, MagicMock, patch
+
 import pytest
-from unittest.mock import patch, MagicMock, AsyncMock
-from django.utils import timezone
 from django.core.cache import cache
 from django.test import override_settings
-from core.models import Source, Content, TopicPrediction
+from django.utils import timezone
+
+from core.models import Content, Source, TopicPrediction
 from sources.scheduler import ContentScheduler
 from sources.tests.conftest import get_unique_url
 

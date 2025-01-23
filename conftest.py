@@ -1,9 +1,10 @@
 # conftest.py
-import pytest
 import asyncio
 import logging
 import os
+
 import django
+import pytest
 
 
 @pytest.fixture(autouse=True)
