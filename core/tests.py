@@ -1,14 +1,13 @@
-import xml.etree.ElementTree as ET
-from datetime import datetime, timedelta
+from datetime import timedelta
 from io import StringIO
 
 from django.contrib.gis.geos import Point
-from django.core.exceptions import ValidationError
 from django.test import TestCase
 from django.utils import timezone
 
 from core.admin import process_opml_file
-from core.models import Content, Source, Topic, TopicPrediction, TrainingExample
+from core.models import Content, Source
+from topics.models import Topic, TopicPrediction
 
 
 class SourceModelTests(TestCase):

@@ -1,8 +1,10 @@
 # core/views.py
-from django.db.models import Case, F, FloatField, Prefetch, Q, Value, When
+from django.db.models import Case, F, FloatField, Prefetch, Value, When
 from django.views.generic import ListView
 
-from .models import Content, Source, TopicPrediction
+from topics.models import TopicPrediction
+
+from .models import Content, Source
 
 
 class AllArticlesView(ListView):
