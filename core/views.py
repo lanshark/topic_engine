@@ -2,7 +2,7 @@
 from django.db.models import Case, F, FloatField, Prefetch, Value, When
 from django.views.generic import ListView
 
-from .models import Content, Source, TopicPrediction
+from .models import Content, ModelConfig, Source, TopicPrediction
 
 
 class AllArticlesView(ListView):
@@ -55,4 +55,16 @@ class AllArticlesView(ListView):
         # Add sources for the filter dropdown
         context["sources"] = Source.objects.filter(active=True).order_by("name")
         context["filter"] = self.request.GET.get("filter")
+        return context
+
+
+class ModelConfigListView(ListView):
+    model = ModelConfig
+    paginate_by = 50  # if pagination is desired
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #        topic_id = context["topic_id"]
+        #        topic = Topic.objects.filter(pk=topic_id)
+        #        context["topic_name"] = topic.name
         return context

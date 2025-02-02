@@ -34,7 +34,7 @@ def add_training_data(request, article_id):
 
 class TopicListView(ListView):
     model = Topic
-    paginate_by = 100  # if pagination is desired
+    paginate_by = 50  # if pagination is desired
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)

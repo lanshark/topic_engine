@@ -3,6 +3,7 @@ import uuid
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.views.generic.list import ListView
 
 from core.models import Content, Source, TopicPrediction
 
@@ -87,3 +88,12 @@ def mark_relevance(request, article_id):
         article.save()
         return JsonResponse({"status": "success", "action": action})
     return JsonResponse({"status": "failed"})
+
+
+class SourceListView(ListView):
+    model = Source
+    paginate_by = 50  # if pagination is desired
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context

@@ -26,10 +26,10 @@
             <tbody>
                 {% for article in articles %}
                 <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
-                    <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td class="px-6 py-4">
                         {{ article.publish_date|date:"Y-m-d H:i" }}
                     </td>
-                    <td class="px-6 py-4 text-sm text-gray-500 dark:text-gray-400">
+                    <td class="px-6 py-4">
                         {{ article.source.name }}
                     </td>
                     <td class="px-6 py-4">
