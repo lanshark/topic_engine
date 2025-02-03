@@ -137,17 +137,19 @@ class Topic(BaseModel):
     """Topic for content classification with hierarchy support"""
 
     name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, help_text="must be unique")
     description = models.TextField(blank=True)
     parent = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children"
     )
 
     # Templates for content generation
-    templates = models.JSONField(default=dict, blank=True)
+    templates = models.JSONField(
+        default=dict, blank=True, help_text="templates for content generation"
+    )
 
     # Topic hierarchy path for efficient traversal
-    path = models.CharField(max_length=1000, blank=True)
+    path = models.CharField(max_length=1000, blank=True, help_text="path for traversal")
     depth = models.IntegerField(default=0)
 
     class Meta:
@@ -172,6 +174,9 @@ class Topic(BaseModel):
 
     def get_absolute_url(self):
         return reverse_lazy("topic-detail", kwargs={"slug": self.slug})
+
+    def __str__(self):
+        return self.name
 
     def get_ancestors(self) -> List["Topic"]:
         """Get all ancestor topics"""
