@@ -9,6 +9,7 @@ from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -168,6 +169,9 @@ class Topic(BaseModel):
             self.depth = 0
 
         super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse_lazy("topic-detail", kwargs={"slug": self.slug})
 
     def get_ancestors(self) -> List["Topic"]:
         """Get all ancestor topics"""

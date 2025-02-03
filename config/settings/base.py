@@ -110,6 +110,8 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "crispy_forms",
+    "crispy_tailwind",
     "django_extensions",
     # 'django_htmx',  # We'll add this later
 ]

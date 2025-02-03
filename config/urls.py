@@ -6,7 +6,8 @@ from django.urls import path
 from core.views import AllArticlesView, ModelConfigListView
 from sources.views import (SourceListView, article_detail, article_list,
                            mark_relevance, source_list)
-from topics.views import TopicListView, add_training_data
+from topics.views import (TopicCreateView, TopicDeleteView, TopicDetailView,
+                          TopicListView, TopicUpdateView, add_training_data)
 
 urlpatterns = [
     path("", source_list, name="source_list"),
@@ -19,6 +20,10 @@ urlpatterns = [
         "article/<uuid:article_id>/add_training_data/", add_training_data, name="add_training_data"
     ),
     path("topics/", TopicListView.as_view(), name="topic_list"),
+    path("topics/create/", TopicCreateView.as_view(), name="topic-create"),
+    path("topics/<slug:slug>/", TopicDetailView.as_view(), name="topic-detail"),
+    path("topics/<slug:slug>/update/", TopicUpdateView.as_view(), name="topic-update"),
+    path("topics/<slug:slug>/delete/", TopicDeleteView.as_view(), name="topic-delete"),
     path("modelconfigs/", ModelConfigListView.as_view(), name="modelconfig_list"),
     path("admin/", admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
