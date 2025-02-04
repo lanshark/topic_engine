@@ -4,12 +4,12 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
-from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
 from core.models import Content, Topic
-from topics.forms import TopicForm
+
+from .forms import TopicForm
 
 BASE_TRAINING_PATH = Path(settings.DATA_DIR, "training_data")
 DEFAULT_TOPIC = ""
@@ -51,13 +51,6 @@ class TopicCreateView(CreateView):
     form_class = TopicForm
     template_name = "topics/topic_form.html"
     success_url = reverse_lazy("topic-list")
-    # fields = ["name"]
-
-
-class TopicDetailView(DeleteView):
-    model = Topic
-    template_name = "topics/topic_detail.html"
-    # fields = ["name"]
 
 
 class TopicUpdateView(UpdateView):
@@ -65,7 +58,6 @@ class TopicUpdateView(UpdateView):
     form_class = TopicForm
     template_name = "topics/topic_form.html"
     success_url = reverse_lazy("topic-list")
-    # fields = ["name"]
 
 
 class TopicDeleteView(DeleteView):

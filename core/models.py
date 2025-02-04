@@ -57,6 +57,7 @@ class Source(BaseModel):
 
     url = models.URLField(unique=True)
     name = models.CharField(max_length=500)
+    slug = models.SlugField(unique=True, blank=True, help_text="must be unique")
     source_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     active = models.BooleanField(default=True)
     check_frequency = models.IntegerField(default=3600)  # seconds
@@ -128,6 +129,15 @@ class Source(BaseModel):
         else:
             self.error_count += 1
         self.save(update_fields=["last_checked", "last_success", "error_count"])
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
+
+    def get_absolute_url():
+        return reverse_lazy("source-detail", kwargs={"slug": self.slug})
 
     def __str__(self):
         return f"{self.name} ({self.source_type})"
@@ -252,13 +262,15 @@ class Content(BaseModel):
         return f"{self.title[:50]}..."
 
 
+def get_default_params():
+    return {"model_type": "medium", "num_epochs": 2, "num_iterations": 20, "batch_size": 16}
+
+
 class ModelConfig(BaseModel):
     """Configuration for SetFit models used in predictions"""
 
-    def get_default_params(self):
-        return {"model_type": "medium", "num_epochs": 2, "num_iterations": 20, "batch_size": 16}
-
     name = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(unique=True, blank=True, help_text="must be unique")
     description = models.TextField(blank=True)
     active = models.BooleanField(default=True)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
@@ -286,6 +298,15 @@ class ModelConfig(BaseModel):
         """Get path where model should be stored"""
         model_path = Path(settings.DATA_DIR, "setfit_models", self.name)
         return str(model_path)
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse_lazy("modelconfig-detail", kwargs={"slug": self.slug})
 
 
 class TopicPrediction(BaseModel):
