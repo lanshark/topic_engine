@@ -49,8 +49,6 @@
                     </td>
                     <td class="px-6 py-2">
                         <a href="/modelconfigs/{{ modelconfig.slug }}/update" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Edit</a>
-                        <br /><br />
-                        <a href="/modelconfigs/{{ modelconfig.slug }}/delete" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Delete</a>
                     </td>
                 </tr>
                 <tr>
@@ -68,6 +66,16 @@
                     </td>
                     <td class="px-2">
                         Iterations: {{ modelconfig.parameters.num_iterations }}
+                    </td>
+                    <td class="px-2">
+                        &nbsp; test
+                    </td>
+                    <td class="px-2">
+                        &nbsp; test
+                    </td>
+                    <td class="px-2">
+                        <a href="/modelconfigs/{{ modelconfig.slug }}/delete" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Delete</a>
+                        <br /><br />
                     </td>
                 </tr>
                 {% endfor %}
