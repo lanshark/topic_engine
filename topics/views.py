@@ -4,6 +4,7 @@ from django.conf import settings
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404
 from django.urls import reverse_lazy
+from django.views.generic import DetailView
 from django.views.generic.edit import CreateView, DeleteView, UpdateView
 from django.views.generic.list import ListView
 
@@ -53,14 +54,19 @@ class TopicCreateView(CreateView):
     success_url = reverse_lazy("topic-list")
 
 
+class TopicDeleteView(DeleteView):
+    model = Topic
+    template_name = "topics/topic_confirm_delete.html"
+    success_url = reverse_lazy("topic-list")
+
+
+class TopicDetailView(DetailView):
+    model = Topic
+    template_name = "topics/topic_detail.html"
+
+
 class TopicUpdateView(UpdateView):
     model = Topic
     form_class = TopicForm
     template_name = "topics/topic_form.html"
-    success_url = reverse_lazy("topic-list")
-
-
-class TopicDeleteView(DeleteView):
-    model = Topic
-    template_name = "topics/topic_confirm_delete.html"
     success_url = reverse_lazy("topic-list")

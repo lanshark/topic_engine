@@ -110,24 +110,21 @@ class SourceCreateView(CreateView):
     form_class = SourceForm
     template_name = "sources/source_form.html"
     success_url = reverse_lazy("source-list")
-    # fields = ["name"]
+
+
+class SourceDeleteView(DeleteView):
+    model = Source
+    template_name = "sources/source_confirm_delete.html"
+    success_url = reverse_lazy("source-list")
 
 
 class SourceDetailView(DetailView):
     model = Source
     template_name = "sources/source_detail.html"
-    # fields = ["name"]
 
 
 class SourceUpdateView(UpdateView):
     model = Source
     form_class = SourceForm
     template_name = "sources/source_form.html"
-    success_url = reverse_lazy("source-list")
-    # fields = ["name"]
-
-
-class SourceDeleteView(DeleteView):
-    model = Source
-    template_name = "sources/source_confirm_delete.html"
     success_url = reverse_lazy("source-list")

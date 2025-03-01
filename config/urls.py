@@ -10,8 +10,8 @@ from sources.views import (SourceCreateView, SourceDeleteView,
                            SourceDetailView, SourceListView, SourceUpdateView,
                            article_detail, article_list, home_list,
                            mark_relevance)
-from topics.views import (TopicCreateView, TopicDeleteView, TopicListView,
-                          TopicUpdateView, add_training_data)
+from topics.views import (TopicCreateView, TopicDeleteView, TopicDetailView,
+                          TopicListView, TopicUpdateView, add_training_data)
 
 urlpatterns = [
     path("", home_list, name="home_list"),
@@ -20,15 +20,16 @@ urlpatterns = [
     path("sources<slug:slug>/", SourceDetailView.as_view(), name="source-detail"),
     path("sources/<slug:slug>/update/", SourceUpdateView.as_view(), name="source-update"),
     path("sources/<slug:slug>/delete/", SourceDeleteView.as_view(), name="source-delete"),
-    path("source/<uuid:source_id>/", article_list, name="article_list"),
-    path("articles/", AllArticlesView.as_view(), name="all_articles"),
-    path("article/<uuid:article_id>/", article_detail, name="article_detail"),
-    path("article/<uuid:article_id>/mark_relevance/", mark_relevance, name="mark_relevance"),
+    path("source/<uuid:source_id>/", article_list, name="article-list"),
+    path("articles/", AllArticlesView.as_view(), name="all-articles"),
+    path("article/<uuid:article_id>/", article_detail, name="article-detail"),
+    path("article/<uuid:article_id>/mark_relevance/", mark_relevance, name="mark-relevance"),
     path(
-        "article/<uuid:article_id>/add_training_data/", add_training_data, name="add_training_data"
+        "article/<uuid:article_id>/add_training_data/", add_training_data, name="add-training_data"
     ),
     path("topics/", TopicListView.as_view(), name="topic-list"),
     path("topics/create/", TopicCreateView.as_view(), name="topic-create"),
+    path("topics/<slug:slug>/", TopicDetailView.as_view(), name="topic-detail"),
     path("topics/<slug:slug>/update/", TopicUpdateView.as_view(), name="topic-update"),
     path("topics/<slug:slug>/delete/", TopicDeleteView.as_view(), name="topic-delete"),
     path("modelconfigs/", ModelConfigListView.as_view(), name="modelconfig-list"),
