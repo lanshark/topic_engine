@@ -1,5 +1,5 @@
 from crispy_forms.helper import FormHelper
-from crispy_forms.layout import Column, Layout, Row, Submit
+from crispy_forms.layout import HTML, ButtonHolder, Column, Layout, Row, Submit
 from django import forms
 
 from core.models import Source
@@ -28,9 +28,14 @@ class SourceForm(forms.ModelForm):
                 Column("check_frequency", css_class="form-group"),
                 css_class="form-row",
             ),
-            Submit(
-                "submit",
-                "Save",
-                css_class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600",
+            ButtonHolder(
+                Submit(
+                    "submit",
+                    "Save",
+                    css_class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600",
+                ),
+                HTML(
+                    """<a href="{% url "source-list" %}" class="px-4 py-3 bg-blue-500 text-white rounded hover:bg-blue-600">Cancel</a>"""
+                ),
             ),
         )

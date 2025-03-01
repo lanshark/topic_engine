@@ -26,7 +26,6 @@ class ModelConfigForm(forms.ModelForm):
                 Column("active", css_class="form-group"),
                 Column("topic", css_class="form-group"),
                 Column("training_examples", css_class="form-group"),
-                # Column("parameters", css_class="form-group"),
                 css_class="form-row",
             ),
             Submit(
