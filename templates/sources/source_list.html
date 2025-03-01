@@ -1,19 +1,82 @@
-{% extends 'core/base.html' %}
+{% extends 'base.html' %}
 
-{% block source_list %}
-    <h2 class="text-lg font-bold px-4 py-2 text-gray-700 dark:text-gray-200">Sources</h2>
-    <ul class="space-y-1">
-        {% for source in sources %}
-            <li class="px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-700">
-                <a hx-get="/source/{{ source.id }}/" 
-                   hx-target="#article-list"
-                   class="flex justify-between items-center">
-                    <span>{{ source.name }}</span>
-                    <span class="text-sm text-gray-500 dark:text-gray-400">
-                        {{ source.content_set.count }}
-                    </span>
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-4 flex justify-between items-center">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Sources</h1>
+    </div>
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Name</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">URL</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Type</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Active</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Frequency</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Last Check</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Last Success</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Errors</th>
+                    <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for source in source_list %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="px-6 py-4">
+                        <a href="/sources/{{ source.slug }}">{{ source.name }}</a>
+                    </td>
+                    <td class="px-6 py-4">
+                        <a href="{{ source.url }}" target="_blank" class="text-blue-600 dark:text-blue-400 hover:underline">
+                            {{ source.url }}
+                        </a>
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ source.source_type }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ source.active }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ source.check_frequency }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ source.last_checked|date:"Y-m-d H:i" }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ source.last_success|date:"Y-m-d H:i" }}
+                    </td>
+                    <td class="px-6 py-4">
+                        {{ source.error_count }}
+                    </td>
+                    <td class="px-6 py-2">
+                        <a href="/sources/{{ source.slug }}/update" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Edit</a>
+                        <br /><br />
+                        <a href="/sources/{{ source.slug }}/delete" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Delete</a>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 flex justify-between">
+        <a href="/sources/create/" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add Source</a>
+        <a href="/" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Back</a>
+    </div>
+
+    {% if is_paginated %}
+    <div class="mt-4 flex justify-between">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if filter %}&filter={{ filter }}{% endif %}" 
+               class="text-blue-600">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if filter %}&filter={{ filter }}{% endif %}" 
+               class="text-blue-600">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
 {% endblock %}

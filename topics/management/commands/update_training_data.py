@@ -8,6 +8,8 @@ logger = logging.getLogger(__name__)
 
 BASE_TRAINING_PATH = Path(settings.DATA_DIR, "training_data")
 
+logger = logging.getLogger(__name__)
+
 
 class Command(BaseCommand):
     help = "Update training data for topics"

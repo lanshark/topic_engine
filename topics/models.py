@@ -1,3 +1,1 @@
-from django.db import models
-
-# Create your models here.
+# NOTE: models are defined in core/models.py due to circular references

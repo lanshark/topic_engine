@@ -96,7 +96,7 @@ SECRET_KEY = config("SECRET_KEY")
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = config("DEBUG", default=False, cast=bool)
 
-ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1", cast=Csv())
+ALLOWED_HOSTS = config("ALLOWED_HOSTS", default="127.0.0.1, localhost", cast=Csv())
 
 # Application definition
 DJANGO_APPS = [
@@ -110,6 +110,8 @@ DJANGO_APPS = [
 ]
 
 THIRD_PARTY_APPS = [
+    "crispy_forms",
+    "crispy_tailwind",
     "django_extensions",
     # 'django_htmx',  # We'll add this later
 ]
@@ -123,6 +125,10 @@ LOCAL_APPS = [
 ]
 
 INSTALLED_APPS = DJANGO_APPS + THIRD_PARTY_APPS + LOCAL_APPS
+
+CRISPY_ALLOWED_TEMPLATE_PACKS = "tailwind"
+
+CRISPY_TEMPLATE_PACK = "tailwind"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",

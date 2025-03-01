@@ -9,6 +9,7 @@ from django.contrib.postgres.indexes import GinIndex
 from django.contrib.postgres.search import SearchVectorField
 from django.core.exceptions import ValidationError
 from django.db import models
+from django.urls import reverse_lazy
 from django.utils import timezone
 from django.utils.text import slugify
 
@@ -46,7 +47,6 @@ class BaseModel(models.Model):
         return self.last_checked + timedelta(seconds=self.check_frequency)
 
 
-# NOTE: this should be in sources/models.py
 class Source(BaseModel):
     """Content source - RSS feed or webpage with validation and health tracking"""
 
@@ -57,6 +57,7 @@ class Source(BaseModel):
 
     url = models.URLField(unique=True)
     name = models.CharField(max_length=500)
+    slug = models.SlugField(unique=True, blank=True, help_text="must be unique")
     source_type = models.CharField(max_length=10, choices=TYPE_CHOICES)
     active = models.BooleanField(default=True)
     check_frequency = models.IntegerField(default=3600)  # seconds
@@ -129,26 +130,36 @@ class Source(BaseModel):
             self.error_count += 1
         self.save(update_fields=["last_checked", "last_success", "error_count"])
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+
+        super().save(*args, **kwargs)
+
+    def get_absolute_url():
+        return reverse_lazy("source-detail", kwargs={"slug": self.slug})
+
     def __str__(self):
         return f"{self.name} ({self.source_type})"
 
 
-# NOTE: this should be in topics/models.py
 class Topic(BaseModel):
     """Topic for content classification with hierarchy support"""
 
     name = models.CharField(max_length=200)
-    slug = models.SlugField(unique=True, blank=True)
+    slug = models.SlugField(unique=True, blank=True, help_text="must be unique")
     description = models.TextField(blank=True)
     parent = models.ForeignKey(
         "self", null=True, blank=True, on_delete=models.SET_NULL, related_name="children"
     )
 
     # Templates for content generation
-    templates = models.JSONField(default=dict, blank=True)
+    templates = models.JSONField(
+        default=dict, blank=True, help_text="templates for content generation"
+    )
 
     # Topic hierarchy path for efficient traversal
-    path = models.CharField(max_length=1000, blank=True)
+    path = models.CharField(max_length=1000, blank=True, help_text="path for traversal")
     depth = models.IntegerField(default=0)
 
     class Meta:
@@ -171,6 +182,12 @@ class Topic(BaseModel):
 
         super().save(*args, **kwargs)
 
+    def get_absolute_url(self):
+        return reverse_lazy("topic-detail", kwargs={"slug": self.slug})
+
+    def __str__(self):
+        return self.name
+
     def get_ancestors(self) -> List["Topic"]:
         """Get all ancestor topics"""
         if not self.path:
@@ -183,7 +200,6 @@ class Topic(BaseModel):
         return Topic.objects.filter(path__startswith=f"{self.path}/")
 
 
-# NOTE: this should be in content/models.py
 class Content(BaseModel):
     """Content item with processing state and geographic context"""
 
@@ -246,13 +262,15 @@ class Content(BaseModel):
         return f"{self.title[:50]}..."
 
 
+def get_default_params():
+    return {"model_type": "medium", "num_epochs": 2, "num_iterations": 20, "batch_size": 16}
+
+
 class ModelConfig(BaseModel):
     """Configuration for SetFit models used in predictions"""
 
-    def get_default_params(self):
-        return {"model_type": "medium", "num_epochs": 2, "num_iterations": 20, "batch_size": 16}
-
     name = models.CharField(max_length=200, unique=True)
+    slug = models.SlugField(unique=True, blank=True, help_text="must be unique")
     description = models.TextField(blank=True)
     active = models.BooleanField(default=True)
     topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
@@ -281,8 +299,16 @@ class ModelConfig(BaseModel):
         model_path = Path(settings.DATA_DIR, "setfit_models", self.name)
         return str(model_path)
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
 
-# NOTE: this should be in topics/models.py
+        super().save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse_lazy("modelconfig-detail", kwargs={"slug": self.slug})
+
+
 class TopicPrediction(BaseModel):
     """Score and confidence for content-topic relevance"""
 
@@ -301,7 +327,21 @@ class TopicPrediction(BaseModel):
         return f"{self.content.title[:30]} - {self.model_config.name} ({self.result})"
 
 
-# NOTE: this should be in topics/models.py
+class TopicScore(BaseModel):
+    """Through model for Content-Topic relationship with relevance score"""
+
+    content = models.ForeignKey(Content, on_delete=models.CASCADE)
+    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
+    score = models.FloatField()
+    confidence = models.FloatField()
+
+    class Meta:
+        unique_together = ["content", "topic"]
+        indexes = [
+            models.Index(fields=["score", "confidence"]),
+        ]
+
+
 class TrainingExample(BaseModel):
     """Training example for topic classification"""
 
@@ -326,19 +366,3 @@ class TrainingExample(BaseModel):
 
     def __str__(self):
         return f"{self.text[:50]}... ({self.topic.name})"
-
-
-# NOTE: this should be in topics/models.py
-class TopicScore(BaseModel):
-    """Through model for Content-Topic relationship with relevance score"""
-
-    content = models.ForeignKey(Content, on_delete=models.CASCADE)
-    topic = models.ForeignKey(Topic, on_delete=models.CASCADE)
-    score = models.FloatField()
-    confidence = models.FloatField()
-
-    class Meta:
-        unique_together = ["content", "topic"]
-        indexes = [
-            models.Index(fields=["score", "confidence"]),
-        ]

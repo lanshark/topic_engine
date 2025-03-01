@@ -3,8 +3,14 @@ import uuid
 from django.core.serializers.json import DjangoJSONEncoder
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, render
+from django.urls import reverse_lazy
+from django.views.generic import DetailView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
+from django.views.generic.list import ListView
 
 from core.models import Content, Source, TopicPrediction
+
+from .forms import SourceForm
 
 
 class UUIDEncoder(DjangoJSONEncoder):
@@ -14,9 +20,9 @@ class UUIDEncoder(DjangoJSONEncoder):
         return super().default(obj)
 
 
-def source_list(request):
+def home_list(request):
     sources = Source.objects.all()
-    return render(request, "sources/source_list.html", {"sources": sources})
+    return render(request, "core/home_list.html", {"sources": sources})
 
 
 def article_list(request, source_id):
@@ -87,3 +93,38 @@ def mark_relevance(request, article_id):
         article.save()
         return JsonResponse({"status": "success", "action": action})
     return JsonResponse({"status": "failed"})
+
+
+class SourceListView(ListView):
+    model = Source
+    paginate_by = 50  # if pagination is desired
+    template_name = "sources/source_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        return context
+
+
+class SourceCreateView(CreateView):
+    model = Source
+    form_class = SourceForm
+    template_name = "sources/source_form.html"
+    success_url = reverse_lazy("source-list")
+
+
+class SourceDeleteView(DeleteView):
+    model = Source
+    template_name = "sources/source_confirm_delete.html"
+    success_url = reverse_lazy("source-list")
+
+
+class SourceDetailView(DetailView):
+    model = Source
+    template_name = "sources/source_detail.html"
+
+
+class SourceUpdateView(UpdateView):
+    model = Source
+    form_class = SourceForm
+    template_name = "sources/source_form.html"
+    success_url = reverse_lazy("source-list")

@@ -1,8 +1,11 @@
 # core/views.py
-from django.db.models import Case, F, FloatField, Prefetch, Q, Value, When
-from django.views.generic import ListView
+from django.db.models import Case, F, FloatField, Prefetch, Value, When
+from django.urls import reverse_lazy
+from django.views.generic import DetailView, ListView
+from django.views.generic.edit import CreateView, DeleteView, UpdateView
 
-from .models import Content, Source, TopicPrediction
+from .forms import ModelConfigForm
+from .models import Content, ModelConfig, Source, TopicPrediction
 
 
 class AllArticlesView(ListView):
@@ -56,3 +59,41 @@ class AllArticlesView(ListView):
         context["sources"] = Source.objects.filter(active=True).order_by("name")
         context["filter"] = self.request.GET.get("filter")
         return context
+
+
+class ModelConfigListView(ListView):
+    model = ModelConfig
+    paginate_by = 50  # if pagination is desired
+    template_name = "core/modelconfig_list.html"
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        #        topic_id = context["topic_id"]
+        #        topic = Topic.objects.filter(pk=topic_id)
+        #        context["topic_name"] = topic.name
+        return context
+
+
+class ModelConfigCreateView(CreateView):
+    model = ModelConfig
+    form_class = ModelConfigForm
+    template_name = "core/modelconfig_form.html"
+    success_url = reverse_lazy("modelconfig-list")
+
+
+class ModelConfigDetailView(DetailView):
+    model = ModelConfig
+    template_name = "core/modelconfig_detail.html"
+
+
+class ModelConfigUpdateView(UpdateView):
+    model = ModelConfig
+    form_class = ModelConfigForm
+    template_name = "core/modelconfig_form.html"
+    success_url = reverse_lazy("modelconfig-list")
+
+
+class ModelConfigDeleteView(DeleteView):
+    model = ModelConfig
+    template_name = "core/modelconfig_confirm_delete.html"
+    success_url = reverse_lazy("modelconfig-list")

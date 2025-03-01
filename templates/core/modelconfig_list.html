@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="container mx-auto px-4 py-8">
+    <div class="mb-4 flex justify-between items-center py-4">
+        <h1 class="text-2xl font-bold text-gray-800 dark:text-white">Model Configs</h1>
+    </div>
+    <div class="bg-white dark:bg-gray-800 shadow-md rounded-lg overflow-hidden">
+        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead class="bg-gray-50 dark:bg-gray-700">
+                <tr>
+                    <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Name</th>
+                    <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Description</th>
+                    <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Active</th>
+                    <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Topic</th>
+                    <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Last Trained</th>
+                    <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Training Examples</th>
+                    <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">Accuracy</th>
+                    <th class="px-2 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase">&nbsp;</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for modelconfig in modelconfig_list %}
+                <tr class="hover:bg-gray-50 dark:hover:bg-gray-700">
+                    <td class="px-2 py-4">
+                        <a href="/modelconfigs/{{ modelconfig.slug }}">{{ modelconfig.name }}</a>
+                    </td>
+                    <td class="px-2 py-4">
+                        {{ modelconfig.description }}
+                    </td>
+                    <td class="px-2 py-4">
+                        {{ modelconfig.active }}
+                    </td>
+                    <td class="px-2 py-4">
+                        {{ modelconfig.topic.name }}
+                    </td>
+                    <td class="px-2 py-4">
+                        {{ modelconfig.last_trained|date:"Y-m-d H:i" }}
+                    </td>
+                    <td class="px-2 py-4">
+                        {{ modelconfig.training_examples }}
+                    </td>
+                    <td class="px-2 py-4">
+                        {% if modelconfig.accuracy %}
+                          {{ modelconfig.accuracy }}
+                        {% else %}
+                          N/A
+                        {% endif %}
+                    </td>
+                    <td class="px-6 py-2">
+                        <a href="/modelconfigs/{{ modelconfig.slug }}/update" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Edit</a>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="px-2">
+                        &nbsp;
+                    </td>
+                    <td class="px-2">
+                        Batch Size: {{ modelconfig.parameters.batch_size }}
+                    </td>
+                    <td class="px-2">
+                        Model Type: {{ modelconfig.parameters.model_type }}
+                    </td>
+                    <td class="px-2">
+                        # Epochs: {{ modelconfig.parameters.num_epochs }}
+                    </td>
+                    <td class="px-2">
+                        Iterations: {{ modelconfig.parameters.num_iterations }}
+                    </td>
+                    <td class="px-2">
+                        &nbsp; test
+                    </td>
+                    <td class="px-2">
+                        &nbsp; test
+                    </td>
+                    <td class="px-2">
+                        <a href="/modelconfigs/{{ modelconfig.slug }}/delete" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Delete</a>
+                        <br /><br />
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <div class="mt-4 flex justify-between">
+        <a href="/modelconfigs/create/" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Add Model Config</a>
+        <a href="/" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Back</a>
+    </div>
+
+    {% if is_paginated %}
+    <div class="mt-4 flex justify-between">
+        {% if page_obj.has_previous %}
+            <a href="?page={{ page_obj.previous_page_number }}{% if filter %}&filter={{ filter }}{% endif %}" 
+               class="text-blue-600">Previous</a>
+        {% endif %}
+        <span>Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</span>
+        {% if page_obj.has_next %}
+            <a href="?page={{ page_obj.next_page_number }}{% if filter %}&filter={{ filter }}{% endif %}" 
+               class="text-blue-600">Next</a>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

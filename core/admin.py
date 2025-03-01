@@ -8,7 +8,7 @@ from django.shortcuts import redirect, render
 from django.urls import path
 from django.utils.html import format_html
 
-from .models import Content, ModelConfig, Source, Topic, TopicPrediction, TrainingExample
+from .models import Content, ModelConfig, Source, TrainingExample
 
 
 class OPMLUploadForm(forms.Form):
@@ -78,19 +78,6 @@ class SourceAdmin(admin.ModelAdmin):
         return render(request, "admin/core/source/opml_upload.html", {"form": form})
 
 
-@admin.register(Topic)
-class TopicAdmin(admin.ModelAdmin):
-    list_display = ("name", "slug", "parent", "depth", "path")
-    list_filter = ("depth",)
-    search_fields = ("name", "slug", "path")
-    prepopulated_fields = {"slug": ("name",)}
-
-    def get_readonly_fields(self, request, obj=None):
-        if obj:  # Editing existing object
-            return ("path", "depth")
-        return ()
-
-
 @admin.register(Content)
 class ContentAdmin(GISModelAdmin):
     list_display = ("title", "source", "processed", "publish_date")
@@ -114,13 +101,6 @@ class ContentAdmin(GISModelAdmin):
         ("Geographic", {"fields": ("location", "geo_context")}),
         ("Metadata", {"fields": ("publish_date", "authors", "metadata")}),
     )
-
-
-@admin.register(TopicPrediction)
-class TopicPredictionAdmin(admin.ModelAdmin):
-    list_display = ("content", "model_config", "result", "confidence", "created_at")
-    list_filter = ("result", "model_config", "content__processed")
-    search_fields = ("content__title", "model_config__name")
 
 
 @admin.register(TrainingExample)

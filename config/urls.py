@@ -1,33 +1,49 @@
-"""config URL Configuration
-
-The `urlpatterns` list routes URLs to views. For more information please see:
-    https://docs.djangoproject.com/en/4.1/topics/http/urls/
-Examples:
-Function views
-    1. Add an import:  from my_app import views
-    2. Add a URL to urlpatterns:  path('', views.home, name='home')
-Class-based views
-    1. Add an import:  from other_app.views import Home
-    2. Add a URL to urlpatterns:  path('', Home.as_view(), name='home')
-Including another URLconf
-    1. Import the include() function: from django.urls import include, path
-    2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
-"""
-from django.contrib import admin
-from django.urls import path, include
 from django.conf import settings
 from django.conf.urls.static import static
+from django.contrib import admin
+from django.urls import path
 
-from core.views import AllArticlesView
-from sources.views import source_list, article_list, article_detail, mark_relevance
-from topics.views import add_training_data
+from core.views import (AllArticlesView, ModelConfigCreateView,
+                        ModelConfigDeleteView, ModelConfigDetailView,
+                        ModelConfigListView, ModelConfigUpdateView)
+from sources.views import (SourceCreateView, SourceDeleteView,
+                           SourceDetailView, SourceListView, SourceUpdateView,
+                           article_detail, article_list, home_list,
+                           mark_relevance)
+from topics.views import (TopicCreateView, TopicDeleteView, TopicDetailView,
+                          TopicListView, TopicUpdateView, add_training_data)
 
 urlpatterns = [
-    path('', source_list, name='source_list'),
-    path('source/<uuid:source_id>/', article_list, name='article_list'),
-    path('articles/', AllArticlesView.as_view(), name='all_articles'),
-    path('article/<uuid:article_id>/', article_detail, name='article_detail'),
-    path('article/<uuid:article_id>/mark_relevance/', mark_relevance, name='mark_relevance'),
-    path('article/<uuid:article_id>/add_training_data/', add_training_data, name='add_training_data'),
-    path('admin/', admin.site.urls),
+    path("", home_list, name="home_list"),
+    path("sources/", SourceListView.as_view(), name="source-list"),
+    path("sources/create/", SourceCreateView.as_view(), name="source-create"),
+    path("sources/<slug:slug>/", SourceDetailView.as_view(), name="source-detail"),
+    path("sources/<slug:slug>/update/", SourceUpdateView.as_view(), name="source-update"),
+    path("sources/<slug:slug>/delete/", SourceDeleteView.as_view(), name="source-delete"),
+    path("source/<uuid:source_id>/", article_list, name="article-list"),
+    path("articles/", AllArticlesView.as_view(), name="all-articles"),
+    path("article/<uuid:article_id>/", article_detail, name="article-detail"),
+    path("article/<uuid:article_id>/mark_relevance/", mark_relevance, name="mark-relevance"),
+    path(
+        "article/<uuid:article_id>/add_training_data/", add_training_data, name="add-training_data"
+    ),
+    path("topics/", TopicListView.as_view(), name="topic-list"),
+    path("topics/create/", TopicCreateView.as_view(), name="topic-create"),
+    path("topics/<slug:slug>/", TopicDetailView.as_view(), name="topic-detail"),
+    path("topics/<slug:slug>/update/", TopicUpdateView.as_view(), name="topic-update"),
+    path("topics/<slug:slug>/delete/", TopicDeleteView.as_view(), name="topic-delete"),
+    path("modelconfigs/", ModelConfigListView.as_view(), name="modelconfig-list"),
+    path("modelconfigs/create/", ModelConfigCreateView.as_view(), name="modelconfig-create"),
+    path("modelconfigs/<slug:slug>/", ModelConfigDetailView.as_view(), name="modelconfig-detail"),
+    path(
+        "modelconfigs/<slug:slug>/update/",
+        ModelConfigUpdateView.as_view(),
+        name="modelconfig-update",
+    ),
+    path(
+        "modelconfigs/<slug:slug>/delete/",
+        ModelConfigDeleteView.as_view(),
+        name="modelconfig-delete",
+    ),
+    path("admin/", admin.site.urls),
 ] + static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)

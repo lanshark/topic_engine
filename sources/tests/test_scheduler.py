@@ -6,7 +6,7 @@ from django.core.cache import cache
 from django.test import override_settings
 from django.utils import timezone
 
-from core.models import Content, Source, TopicPrediction
+from core.models import Content, Source
 from sources.scheduler import ContentScheduler
 from sources.tests.conftest import get_unique_url
 
